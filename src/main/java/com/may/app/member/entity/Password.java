@@ -1,8 +1,26 @@
-package com.may.app.member;
+package com.may.app.member.entity;
 
-public class PasswordStrengthMeter {
+import javax.persistence.Embeddable;
 
-	public PasswordStrength meter(String string) {
+import com.may.app.member.PasswordStrength;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@Getter
+@Embeddable
+public class Password {
+    private String password;
+    
+    public Password(String password) {
+    	PasswordStrength result = passwordValidation(password);
+    	
+    	if(result.pass()) 
+    		this.password=password;
+    }
+    
+    public PasswordStrength passwordValidation(String string) {
 		if(string==null || string.isEmpty()) return PasswordStrength.INVALID;
 		int metCounts = getMetCriteriaCounts(string);
 		
@@ -39,5 +57,4 @@ public class PasswordStrengthMeter {
 		}
 		return false;
 	}
-
 }

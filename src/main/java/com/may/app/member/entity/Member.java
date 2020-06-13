@@ -1,6 +1,7 @@
 package com.may.app.member.entity;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -33,8 +34,8 @@ public class Member {
 	@Column
 	private String name;
 
-	@Column
-	private String password;
+	@Embedded
+	private Password password;
 
 	@Column
 	private boolean blocked;
@@ -42,6 +43,5 @@ public class Member {
 	public Member(String userId, String name) {
 		this.userId = userId;
 		this.name = name;
-		this.password = "1234";
 	}
 }

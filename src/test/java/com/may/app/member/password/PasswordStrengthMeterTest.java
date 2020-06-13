@@ -1,8 +1,11 @@
-package com.may.app.member;
+package com.may.app.member.password;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+
+import com.may.app.member.PasswordStrength;
+import com.may.app.member.entity.Password;
 
 /**
  * TDD예: 암호검사기
@@ -21,12 +24,21 @@ import org.junit.jupiter.api.Test;
  * 예외 상황을 초반에 잡아야 if-else 구조가 미리 만들어지기 때문에 코드를 완성한 뒤에 예외 상황을 반영할 때보다 코드 구조가 덜 바뀐다. 
  * 만들어야할 코드가 잘 떠오르지 않을 때, 상수를 사용해서 테스트를 통과시키고 뒤에 구현을 일반화하는 과정을 점진적으로 구현해가면 진행할 수 있는 밑거름이 된다.
  * 테스트를 통과한 후 리팩토링을 진행한다. 
+ * 
+ * TDD 시작이 안될때
+ * 1. 검증 코드부터 작성한다. 
+ *    -> assertEquals(기대하는 만료일, 실제 만료일)
+ *    -> assertEquals(LocalDate.of(2019,8,9), realExpiryDate)
+ * 2. realExpiryDate를 계산하는 메서드를 작성한다. 
+ *    -> LocalDate realExpiryDate = cal.calculateExpiryDate(파라미터);
+ * 3. 메서드가 어떤 일을 하는지는 모르지만 날짜를 계산해준다. 어떤 파라미터를 받을지 정한다. 
+ * 4. 메서드를 구현한다. 
  */
 public class PasswordStrengthMeterTest {
-	private PasswordStrengthMeter meter = new PasswordStrengthMeter();
+	private final Password pwd = new Password();
 	
 	private void assertStrength(String password, PasswordStrength expStr) {
-		PasswordStrength result = meter.meter(password);
+		PasswordStrength result = pwd.passwordValidation(password);
 		assertEquals(expStr, result);
 	}
 	
