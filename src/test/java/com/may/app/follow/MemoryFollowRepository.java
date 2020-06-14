@@ -10,27 +10,35 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import com.may.app.common.CreateEntity;
+import com.may.app.common.CreateServiceEntity;
 import com.may.app.follow.entity.Follow;
 import com.may.app.follow.repository.FollowRepository;
 import com.may.app.member.entity.Member;
 
 public class MemoryFollowRepository implements FollowRepository {
 	private Map<Long, Follow> follows = new HashMap<>();
+	Long count = 0L;
 	
 	@Override
 	public Follow save(Follow entity) {
-		Follow follow = CreateEntity.createIdExistFollow(entity);
+		Follow follow = Follow.builder()
+			.id(entity.getId()==null?count++:entity.getId())
+			.follower(entity.getFollower())
+			.following(entity.getFollowing())
+			.build();
+		
 		follows.put(follow.getId(), follow);
 		return follow;
 	}
 	
 	@Override
 	public Optional<Follow> findByFollowerAndFollowing(Long followerId, Long followingId) {
-		return follows.values().stream()
+		 Optional<Follow> findFirst = follows.values().stream()
 		.filter(o->o.getFollower().getId().equals(followerId))
 		.filter(o->o.getFollowing().getId().equals(followingId))
 		.findFirst();
+		 
+		 return findFirst;
 	}
 	
 	@Override

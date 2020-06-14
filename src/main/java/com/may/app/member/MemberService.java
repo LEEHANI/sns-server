@@ -11,16 +11,4 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberService {
 	private final MemberRepository memberRepository;
-	
-	public Object member(Long m1) {
-		Member result = memberRepository.getOne(m1);
-		
-		return result.getId();
-	}
-	
-	public Object member(Member save) {
-		Member member = memberRepository.save(save);
-		
-		return member.getId();
-	}
 }

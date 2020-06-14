@@ -13,13 +13,14 @@ import org.springframework.data.domain.Sort;
 import com.may.app.common.CreateEntity;
 import com.may.app.member.entity.Member;
 import com.may.app.member.repository.MemberRepository;
+import com.may.app.tag.entity.Tag;
 
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class MemoryMemberRepository implements MemberRepository {
 	private Map<Long, Member> members = new HashMap<>();
-	Long id = 1L;
+	Long id = 0L;
 	
 	@Override
 	public Optional<Member> findById(Long id) {
@@ -27,10 +28,16 @@ public class MemoryMemberRepository implements MemberRepository {
 	}
 	
 	@Override
-	public Member save(Member entity) {
-		Member member = CreateEntity.createIdExistMember(entity);
+	public <S extends Member> S save(S entity) {
+		Member member = Member.builder()
+			.id(id++)
+			.userId(entity.getUserId())
+			.name(entity.getName())
+			.blocked(entity.isBlocked())
+			.build();
+		
 		members.put(member.getId(), member);
-		return member;
+		return (S)member;
 	}
 
 	@Override
@@ -38,6 +45,12 @@ public class MemoryMemberRepository implements MemberRepository {
 		members.remove(entity.getId());
 	}
 	
+	@Override
+	public <S extends Member> Optional<S> findOne(Example<S> example) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	@Override
 	public List<Member> findAll() {
 		// TODO Auto-generated method stub
@@ -140,12 +153,6 @@ public class MemoryMemberRepository implements MemberRepository {
 	public void deleteAll() {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public <S extends Member> Optional<S> findOne(Example<S> example) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

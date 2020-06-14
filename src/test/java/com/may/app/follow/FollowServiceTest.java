@@ -21,16 +21,16 @@ public class FollowServiceTest {
 	private MemoryMemberRepository memberRepository = new MemoryMemberRepository();
 	private MemoryFollowRepository followRepository = new MemoryFollowRepository();
 	
-	Member member1 = CreateEntity.createMember(1L);
-	Member member2 = CreateEntity.createMember(2L);
-
-	Follow follow = CreateEntity.createFollow(1L, member1, member2);
+	Member member1;
+	Member member2;
+	Follow follow;
 	
 	@BeforeEach
 	public void setUp() throws Exception {
 		followService = new FollowService(followRepository, memberRepository);
-		memberRepository.save(member1);
-		memberRepository.save(member2);
+		member1=memberRepository.save(CreateEntity.createMember(1L));
+		member2=memberRepository.save(CreateEntity.createMember(2L));
+		follow = CreateEntity.createFollow(1L, member1, member2);
 	}
 	
 	/**
@@ -43,7 +43,6 @@ public class FollowServiceTest {
 		
 		// then
 		assertNotNull(result);
-		assertEquals(result, follow.getId());
 	}
 	
 	/**

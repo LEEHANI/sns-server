@@ -46,7 +46,6 @@ public class FeedServiceTest {
 	
 	Member member1 = CreateEntity.createMember(1L);
 	Member member2 = CreateEntity.createMember(2L);
-	Optional<Member> member1Optional = Optional.of(member1);
 	
 	List<Item> items = CreateEntity.createItems(2, member1, true);
 	List<Long> stringItems = items.stream().map(o->o.getId().longValue()).collect(Collectors.toList());
@@ -62,18 +61,17 @@ public class FeedServiceTest {
 	
 	Feed feed1 = CreateEntity.createFeed(1L, member1, resources, comments, items, tags);
 	Feed feed2 = CreateEntity.createFeed(2L, member1, resources, comments, items, tags);
-	Optional<Feed> feed1Optional = Optional.of(feed1);
 
 	final String content = "피드 수정합니다~";
 	
 	@BeforeEach
 	public void setUp() throws Exception{
-		given(memberRepository.findById(member1.getId())).willReturn(member1Optional);
+		given(memberRepository.findById(member1.getId())).willReturn(Optional.of(member1));
 		given(itemRepository.findAllById(stringItems)).willReturn(items);
 		given(tagRepository.findByTitleIn(StringTags)).willReturn(tags);
 		given(tagRepository.saveAll(saveNewTags)).willReturn(saveNewTags);
-		given(feedRepository.findById(feed1.getId())).willReturn(feed1Optional);
-		given(feedRepository.findFetchMemberById(feed1.getId())).willReturn(feed1Optional);
+		given(feedRepository.findById(feed1.getId())).willReturn(Optional.of(feed1));
+		given(feedRepository.findFetchMemberById(feed1.getId())).willReturn(Optional.of(feed1));
 	}
 	
 	/**
