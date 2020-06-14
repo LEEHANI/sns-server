@@ -22,7 +22,16 @@ import com.may.app.tag.entity.Tag;
  */
 public class CreateEntity {
 	
-	static int count = 0;
+	static int count = 1;
+	
+	public static Member createIdExistMember(Member entity) { 
+		return Member.builder()
+				.id(entity.getId()==null?count++:entity.getId())
+				.userId(entity.getUserId())
+				.name(entity.getName())
+				.blocked(entity.isBlocked())
+				.build();
+	}
 	
 	public static Member createMember(Long id) {
 		return Member.builder()
@@ -30,6 +39,14 @@ public class CreateEntity {
 				.userId("멤버"+(id==null?count:id))
 				.name("멤버이름"+(id==null?count++:id))
 				.blocked(true)
+				.build();
+	}
+	
+	public static Follow createIdExistFollow(Follow entity) {
+		return Follow.builder()
+				.id(entity.getId()==null?count++:entity.getId())
+				.follower(entity.getFollower())
+				.following(entity.getFollowing())
 				.build();
 	}
 	
