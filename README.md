@@ -1,6 +1,9 @@
 # SNS Project
 - SNS 서비스를 위한 API 서버
 
+## 계층간 규칙
+- DTO 변환은 되도록 controller에서 진행하지만, 어쩔 수 없는 경우 service에서도 허용한다. (ex) memberService.detail())
+
 ## 사용 기술 및 개발 환경
 java8, Spring Boot, Gradle, Spring Data JPA, MySQL 
 

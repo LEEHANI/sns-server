@@ -26,10 +26,8 @@ import com.may.app.member.repository.MemberRepository;
 @Transactional
 @ActiveProfiles("test")
 public class FollowRepositoryTest {
-	@Autowired
-	private FollowRepository followRepository;
-	@Autowired
-	private MemberRepository memberRepository;
+	@Autowired private FollowRepository followRepository;
+	@Autowired private MemberRepository memberRepository;
 	
 	Member member1 = CreateEntity.createMember(null);
 	Member member2 = CreateEntity.createMember(null);

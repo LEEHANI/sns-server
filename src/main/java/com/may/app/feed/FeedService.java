@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +34,7 @@ public class FeedService {
 	private final TagRepository tagRepository;
 	private final ApplicationEventPublisher applicationEventPublisher;
 
+	@CacheEvict(value = "members", key = "#memberId")
 	@Transactional
 	public Feed add
 	(
@@ -111,6 +113,7 @@ public class FeedService {
 		return feed;
 	}
 	
+	@CacheEvict(value = "members", key = "#memberId")
 	@Transactional
 	public Long delete(Long id, Long memberId) {
 		Feed feed = feedRepository.findFetchMemberById(id).orElseThrow(()-> new NoFeedException());

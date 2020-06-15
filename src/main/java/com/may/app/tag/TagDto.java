@@ -1,5 +1,7 @@
 package com.may.app.tag;
 
+import java.io.Serializable;
+
 import com.may.app.tag.entity.Tag;
 
 import lombok.AllArgsConstructor;
@@ -12,7 +14,8 @@ public class TagDto {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class Get  {
+	public static class Get implements Serializable {
+		private static final long serialVersionUID = 1L;
 		private String title;
 		
 		public Get(Tag tag) {

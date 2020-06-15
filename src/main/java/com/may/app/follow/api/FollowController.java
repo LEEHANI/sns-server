@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.may.app.common.ResponseListDto;
 import com.may.app.follow.FollowService;
 import com.may.app.follow.repository.FollowRepository;
-import com.may.app.member.MemberDto;
-import com.may.app.member.MemberDto.Get;
+import com.may.app.member.dto.MemberDto;
+import com.may.app.member.dto.MemberDto.Get;
 import com.may.app.member.entity.Member;
 
 import lombok.RequiredArgsConstructor;

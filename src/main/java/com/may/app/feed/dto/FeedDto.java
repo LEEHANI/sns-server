@@ -1,5 +1,6 @@
 package com.may.app.feed.dto;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 import com.may.app.feed.entity.Feed;
 import com.may.app.item.ItemDto;
-import com.may.app.member.MemberDto;
+import com.may.app.member.dto.MemberDto;
 import com.may.app.tag.TagDto;
 
 import lombok.AllArgsConstructor;
@@ -50,7 +51,9 @@ public class FeedDto {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class Get {
+	public static class Get implements Serializable {
+		private static final long serialVersionUID = 1L;
+		private Long id;
 		private String content;
 	    private MemberDto.Get member;
 	    private List<ResourceDto.Get> imgs;
@@ -59,6 +62,7 @@ public class FeedDto {
 	    private List<ItemDto.Get> items;
 	    
 	    public Get(Feed feed) {
+	    	this.id=feed.getId();
 	    	this.content=feed.getContent();
 	    	this.member=new MemberDto.Get(feed.getMember());
 	    	this.imgs=feed.getResources().stream().map(ResourceDto.Get::new).collect(Collectors.toList());

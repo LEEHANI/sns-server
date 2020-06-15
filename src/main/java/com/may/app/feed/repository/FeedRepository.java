@@ -1,5 +1,6 @@
 package com.may.app.feed.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -20,4 +21,6 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
 	
 	@EntityGraph(attributePaths = {"member"})
 	Page<Feed> findEntityGraphBy(Pageable pageable);
+	
+	List<Feed> findByMemberId(Long id);
 }

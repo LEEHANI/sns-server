@@ -1,5 +1,7 @@
 package com.may.app.feed.dto;
 
+import java.io.Serializable;
+
 import com.may.app.feed.FeedResourceType;
 import com.may.app.feed.entity.Resource;
 
@@ -13,7 +15,8 @@ public class ResourceDto {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class Get {
+	public static class Get implements Serializable {
+		private static final long serialVersionUID = 1L;
 		private String path;
 	    private FeedResourceType type;
 	    

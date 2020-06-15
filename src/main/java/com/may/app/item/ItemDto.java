@@ -1,6 +1,6 @@
 package com.may.app.item;
 
-import java.util.List;
+import java.io.Serializable;
 
 import com.may.app.item.entity.Item;
 
@@ -23,7 +23,8 @@ public class ItemDto {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class Get {
+	public static class Get implements Serializable {
+		private static final long serialVersionUID = 1L;
 		private String title;
 		private String content;
 		
