@@ -6,19 +6,15 @@ import static org.mockito.BDDMockito.given;
 import java.util.Optional;
 
 import org.assertj.core.util.Lists;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 
 import com.may.app.common.CreateEntity;
 import com.may.app.feed.entity.Feed;
 import com.may.app.feed.repository.FeedRepository;
 import com.may.app.item.repository.ItemRepository;
-import com.may.app.member.dto.MemberDto;
 import com.may.app.member.dto.MemberDto.GetInfo;
 import com.may.app.member.entity.Member;
 import com.may.app.member.repository.MemberRepository;
@@ -49,10 +45,6 @@ public class MemberServiceTest {
 				CreateEntity.createItems(1, member1, true), 
 				CreateEntity.createTags(0, 1, true)
 			);
-	
-	@BeforeEach
-	public void setUp() throws Exception {
-	}
 	
 	@Test
 	public void 회원_상세_조회_성공() throws Exception {
