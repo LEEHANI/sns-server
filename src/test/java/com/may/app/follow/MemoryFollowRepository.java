@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import com.may.app.common.CreateServiceEntity;
 import com.may.app.follow.entity.Follow;
 import com.may.app.follow.repository.FollowRepository;
 import com.may.app.member.entity.Member;

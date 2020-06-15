@@ -73,6 +73,28 @@ public class CreateEntity {
 		return feed;
 	}
 	
+	public static Feed createFeed
+	(
+		Long id, 
+		Member member, 
+		int resourceCount, 
+		int commentCount, 
+		int itemCount, 
+		int tagCount
+	) {
+		Feed feed = Feed.builder()
+				.id(id)
+				.content("피드내용"+(id==null?count:id))
+				.member(member)
+				.resources(createResources(resourceCount, true))
+				.comments(createComments(commentCount, true))
+				.build();
+		createItems(itemCount, member, true).forEach(i-> feed.bind(FeedItem.builder().item(i).build()));
+		createTags(0, tagCount, true).forEach(t-> feed.bind(FeedTag.builder().tag(t).build()));
+		
+		return feed;
+	}
+	
 	public static Tag createTag(Long id) {
 		return Tag.builder()
 				.id(id)
