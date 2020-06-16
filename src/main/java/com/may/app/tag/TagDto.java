@@ -15,7 +15,7 @@ public class TagDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class Get implements Serializable {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 6305319036024980100L;
 		private String title;
 		
 		public Get(Tag tag) {

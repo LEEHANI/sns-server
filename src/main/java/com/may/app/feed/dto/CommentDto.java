@@ -15,7 +15,7 @@ public class CommentDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class Get implements Serializable {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 11919700195740160L;
 		private String content;
 		
 		public Get(Comment comment) {

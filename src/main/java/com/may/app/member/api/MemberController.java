@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.may.app.member.MemberService;
 import com.may.app.member.dto.MemberDto;
+import com.may.app.member.dto.MemberDto.GetInfo;
 
 import lombok.RequiredArgsConstructor;
 

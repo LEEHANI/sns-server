@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import com.may.app.feed.dto.FeedDto;
@@ -26,7 +27,7 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 	private final FeedRepository feedRepository;
 	
-	@Cacheable(cacheNames = "members", key="#id")//, condition = "#result.feeds > 0")
+	@Cacheable(cacheNames = "members", key="#id", condition = "#result.feeds > 0")
 	public MemberDto.GetInfo detail(Long id) {
 		Member member = memberRepository.findById(id).orElseThrow(()->new NoMemberException());
 		List<FeedDto.Get> feeds = feedRepository.findByMemberId(id).stream().map(FeedDto.Get::new).collect(Collectors.toList());

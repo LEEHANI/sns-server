@@ -24,7 +24,7 @@ public class ItemDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class Get implements Serializable {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = -1627855509201937412L;
 		private String title;
 		private String content;
 		

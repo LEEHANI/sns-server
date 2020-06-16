@@ -19,7 +19,7 @@ public class MemberDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class GetInfo implements Serializable {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = -2851681159547099146L;
 		private String userId;
 		private String name;
 		private List<FeedDto.Get> feeds;
@@ -36,7 +36,7 @@ public class MemberDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class Get implements Serializable {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 175075040248498955L;
 		private String userId;
 	    private String name;
 	    
