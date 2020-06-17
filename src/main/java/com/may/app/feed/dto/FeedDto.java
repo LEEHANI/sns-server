@@ -56,11 +56,14 @@ public class FeedDto {
 		private Long id;
 		private String content;
 	    private MemberDto.Get member;
+	    private Boolean isGood;
+	    private Long goodCount;
 	    private List<ResourceDto.Get> imgs;
 	    private List<CommentDto.Get> comments;
 	    private List<TagDto.Get> tags;
 	    private List<ItemDto.Get> items;
 	    
+	   
 	    public Get(Feed feed) {
 	    	this.id=feed.getId();
 	    	this.content=feed.getContent();
@@ -69,6 +72,12 @@ public class FeedDto {
 	    	this.comments=feed.getComments().stream().map(CommentDto.Get::new).collect(Collectors.toList());
 	    	this.tags=feed.getTags().stream().map(f->new TagDto.Get(f.getTag())).collect(Collectors.toList());
 	    	this.items=feed.getItems().stream().map(f->new ItemDto.Get(f.getItem())).collect(Collectors.toList());
+	    }
+	    
+	    public Get(Feed feed, GoodDto good) {
+	    	this(feed);
+	    	this.isGood=good.getIsGood();
+	    	this.goodCount=good.getGoodCount();
 	    }
 	}
 }

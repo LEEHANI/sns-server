@@ -50,10 +50,8 @@ public class FeedController {
 	}
 	
 	@GetMapping(value = "/{id}") 
-	public FeedDto.Get detail(@PathVariable Long id) {
-		Feed entity = feedService.detail(id);
-		
-		return new FeedDto.Get(entity);
+	public FeedDto.Get detail(@PathVariable Long id, @RequestParam(required = false) Long requestMemberId) {
+		return feedService.detail(id, requestMemberId);
 	}
 
 	@GetMapping(value = "")
@@ -100,4 +98,18 @@ public class FeedController {
 		
 		return new ResponseListDto<Boolean>(result==null? false: true);
 	}
+	
+	@PostMapping(value = "/good/{id}")
+	public ResponseListDto<Boolean> good(@PathVariable Long id, @RequestParam Long memberId) {
+		feedService.good(id, memberId);
+		
+		return new ResponseListDto<Boolean>(true);
+	}
+	
+	@DeleteMapping(value = "/good/{id}")
+	public ResponseListDto<Boolean> unGood(@PathVariable Long id, @RequestParam Long memberId) {
+		feedService.unGood(id, memberId);
+		
+		return new ResponseListDto<Boolean>(true);
+	} 
 }

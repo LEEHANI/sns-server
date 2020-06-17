@@ -5,8 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -15,19 +18,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 
 import com.may.app.common.CreateEntity;
+import com.may.app.feed.dto.FeedDto;
 import com.may.app.feed.entity.Comment;
 import com.may.app.feed.entity.Feed;
 import com.may.app.feed.entity.Resource;
+import com.may.app.feed.exception.DuplicateFeedGoodFeedException;
 import com.may.app.feed.exception.FeedOwnerMismatchException;
 import com.may.app.feed.exception.NoFeedException;
+import com.may.app.feed.exception.NoFeedGoodException;
 import com.may.app.feed.repository.FeedRepository;
 import com.may.app.item.entity.Item;
 import com.may.app.item.repository.ItemRepository;
@@ -44,6 +53,8 @@ public class FeedServiceTest {
 	@MockBean private MemberRepository memberRepository;
 	@MockBean private ItemRepository itemRepository;
 	@MockBean private TagRepository tagRepository;
+	@MockBean private RedisTemplate<String, Object> redisTemplate;
+	@MockBean private SetOperations<String, Object> setOperations;
 	
 	Member member1 = CreateEntity.createMember(1L);
 	Member member2 = CreateEntity.createMember(2L);
@@ -58,6 +69,8 @@ public class FeedServiceTest {
 	@BeforeEach
 	public void setUp() throws Exception{
 		given(memberRepository.findById(member1.getId())).willReturn(Optional.of(member1));
+		
+		when(redisTemplate.opsForSet()).thenReturn(setOperations);
 	}
 	
 	/**
@@ -100,7 +113,6 @@ public class FeedServiceTest {
 	/**
 	 * save() Test 실패
 	 * 저장되어 있지 않은 회원을 대상으로 피드 저장할 때는 NoMemberException이 발생한다.
-	 * @throws Exception
 	 */
 	@Test
 	public void 피드_추가_실패() throws Exception {
@@ -110,15 +122,15 @@ public class FeedServiceTest {
 	
 	/**
 	 * detail find() Test 성공
-	 * 피드를 상세 조회한다. 
 	 */
 	@Test
 	public void 피드_상세_조회_성공() throws Exception {
 		//given
 		given(feedRepository.findById(Mockito.any())).willReturn(Optional.of(feed1));
+		when(redisTemplate.opsForSet().size(Mockito.any())).thenReturn(2L);
 		
 		//when
-		Feed result = feedService.detail(feed1.getId());
+		FeedDto.Get result = feedService.detail(feed1.getId(), null);
 		
 		//then
 		assertNotNull(result);
@@ -130,17 +142,15 @@ public class FeedServiceTest {
 	/**
 	 * detail find() Test 실패
 	 * 저장되어 있지 않은 피드를 상세 조회할 때는 NoFeedException이 발생한다.
-	 * @throws Exception
 	 */
 	@Test
 	public void 피드_상세_조회_실패() throws Exception {
 		//when & then
-		assertThrows(NoFeedException.class, ()-> feedService.detail(10L));
+		assertThrows(NoFeedException.class, ()-> feedService.detail(10L, null));
 	}
 	
 	/**
 	 * list find() 성공
-	 * @throws Exception
 	 */
 	@Test
 	public void 피드_페이지_리스트_조회_성공() throws Exception {
@@ -164,9 +174,7 @@ public class FeedServiceTest {
 	}
 	
 	/**
-	 * edit() Test
-	 * 피드를 수정한다. 
-	 * @throws Exception
+	 * edit() Test 성공 
 	 */
 	@Test
 	public void 피드_수정_성공() throws Exception {
@@ -198,7 +206,6 @@ public class FeedServiceTest {
 	/**
 	 * edit() Test
 	 * img, tag, item을 전부 없애기
-	 * @throws Exception
 	 */
 	@Test
 	public void 피드_수정_전부_제로_리스트_성공() throws Exception {
@@ -215,6 +222,10 @@ public class FeedServiceTest {
 		assertEquals(result.getItems().size(), 0);
 	}
 	
+	/**
+	 * edit() Test  실패
+	 * 다른 사람의 피드를 수정하려 시도할 떄 FeedOwnerMismatchException이 발생한다. 
+	 */
 	@Test
 	public void 피드_수정_실패() throws Exception {
 		//given
@@ -243,11 +254,73 @@ public class FeedServiceTest {
 	/**
 	 * find() Test 실패
 	 * 저장되어 있지 않은 피드를 상세 조회할 때는 NoFeedException이 발생한다.
-	 * @throws Exception
 	 */
 	@Test
 	public void 피드_삭제_실패() throws Exception {
 		//when & then
 		assertThrows(NoFeedException.class, ()-> feedService.delete(2L, member1.getId()));
+	}
+	
+	/**
+	 * save() Test 성공 
+	 */
+	@Test
+	public void 피드_좋아요_성공() throws Exception {
+		//given
+		given(feedRepository.findById(Mockito.anyLong())).willReturn(Optional.of(feed1));
+		given(memberRepository.findById(Mockito.anyLong())).willReturn(Optional.of(member1));
+		given(setOperations.add(Mockito.anyString(), Mockito.anyObject())).willReturn(1L);
+		
+		//when
+		Long result = feedService.good(feed1.getId(), member1.getId());
+		
+		//then
+		assertNotNull(result);
+	}
+	
+	/**
+	 * save() Test 실패
+	 * 좋아요를 중복해서 시도할 때는 DuplicateFeedGoodFeedException이 발생한다.
+	 */
+	@Test
+	public void 피드_좋아요_실패() throws Exception {
+		//given
+		given(feedRepository.findById(Mockito.anyLong())).willReturn(Optional.of(feed1));
+		given(memberRepository.findById(Mockito.anyLong())).willReturn(Optional.of(member1));
+		given(setOperations.add(Mockito.anyString(), Mockito.anyObject())).willReturn(0L);
+		
+		//when & then
+		assertThrows(DuplicateFeedGoodFeedException.class, ()->feedService.good(feed1.getId(), member1.getId()));
+	}
+	
+	/**
+	 * delete() Test 성공
+	 */
+	@Test
+	public void 피드_좋아요_해제_성공() throws Exception {
+		//given
+		given(feedRepository.findById(Mockito.anyLong())).willReturn(Optional.of(feed1));
+		given(memberRepository.findById(Mockito.anyLong())).willReturn(Optional.of(member1));
+		given(setOperations.remove(Mockito.anyString(), Mockito.anyObject())).willReturn(1L);
+		
+		//when
+		Long result = feedService.unGood(feed1.getId(), member1.getId());
+		
+		//then
+		assertNotNull(result);
+	}
+	
+	/**
+	 * delete() Test 실패
+	 * 좋아요를 누른적 없는데, 좋아요 해제를 시도할 때는 NoFeedGoodException이 발생한다.
+	 */
+	@Test
+	public void 피드_좋아요_해제_실패() throws Exception {
+		//given
+		given(feedRepository.findById(Mockito.anyLong())).willReturn(Optional.of(feed1));
+		given(memberRepository.findById(Mockito.anyLong())).willReturn(Optional.of(member1));
+		
+		//when & then
+		assertThrows(NoFeedGoodException.class, ()->feedService.unGood(feed1.getId(), member1.getId()));
 	}
 }

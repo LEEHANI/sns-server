@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.may.app.follow.entity.Follow;
-import com.may.app.follow.exception.AlreadyFollowedException;
+import com.may.app.follow.exception.DuplicateFollowException;
 import com.may.app.follow.exception.NoFollowException;
 import com.may.app.follow.repository.FollowRepository;
 import com.may.app.member.entity.Member;
@@ -26,7 +26,7 @@ public class FollowService {
 		
 		Follow follow = followRepository.findByFollowerAndFollowing(followerId, followingId).orElse(null);
 		
-		if(follow!=null) throw new AlreadyFollowedException();
+		if(follow!=null) throw new DuplicateFollowException();
 		
 		Follow result = followRepository.save(new Follow(follower, following));
 		

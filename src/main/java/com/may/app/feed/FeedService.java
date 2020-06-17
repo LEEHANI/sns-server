@@ -8,12 +8,17 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.may.app.event.FollowerPushedEvent;
+import com.may.app.feed.dto.FeedDto;
+import com.may.app.feed.dto.GoodDto;
 import com.may.app.feed.entity.Feed;
+import com.may.app.feed.exception.DuplicateFeedGoodFeedException;
 import com.may.app.feed.exception.NoFeedException;
+import com.may.app.feed.exception.NoFeedGoodException;
 import com.may.app.feed.repository.FeedRepository;
 import com.may.app.item.entity.Item;
 import com.may.app.item.repository.ItemRepository;
@@ -33,7 +38,8 @@ public class FeedService {
 	private final ItemRepository itemRepository;
 	private final TagRepository tagRepository;
 	private final ApplicationEventPublisher applicationEventPublisher;
-
+	private final RedisTemplate<String, Object> redisTemplate;
+	
 	@CacheEvict(value = "members", key = "#memberId")
 	@Transactional
 	public Feed add
@@ -77,10 +83,18 @@ public class FeedService {
 	}
 	
 	@Transactional(readOnly = true)
-	public Feed detail(Long id) {
+	public FeedDto.Get detail(Long id, Long requestMemberId) {
 		Feed feed = feedRepository.findById(id).orElseThrow(()-> new NoFeedException());
+		GoodDto good = goodCheck(id, requestMemberId);
 		
-		return feed;
+		return new FeedDto.Get(feed, good);
+	}
+	
+	public GoodDto goodCheck(Long feedId, Long memberId) {
+		Long count = redisTemplate.opsForSet().size(feedId.toString()); // O(1)
+		Boolean isGood = memberId==null? false : redisTemplate.opsForSet().isMember(feedId.toString(), memberId);
+		
+		return new GoodDto(isGood==null? false : isGood, count);
 	}
 	
 	@Transactional(readOnly = true)
@@ -119,9 +133,30 @@ public class FeedService {
 		Feed feed = feedRepository.findFetchMemberById(id).orElseThrow(()-> new NoFeedException());
 
 		feed.isOwner(memberId);
-		
 		feedRepository.delete(feed);
 		
 		return feed.getId();
+	}
+	
+	@Transactional
+	public Long good(Long id, Long memberId) {
+		feedRepository.findById(id).orElseThrow(()-> new NoFeedException());
+		memberRepository.findById(memberId).orElseThrow(()-> new NoMemberException());
+		
+		Long result = redisTemplate.opsForSet().add(id.toString(), memberId);
+		if(result==0) throw new DuplicateFeedGoodFeedException();
+		
+		return result;
+	}
+	
+	@Transactional
+	public Long unGood(Long id, Long memberId) {
+		feedRepository.findById(id).orElseThrow(()-> new NoFeedException());
+		memberRepository.findById(memberId).orElseThrow(()-> new NoMemberException());
+		
+		Long result = redisTemplate.opsForSet().remove(id.toString(), memberId);
+		if(result==0) throw new NoFeedGoodException(); 
+		
+		return result;
 	}
 }

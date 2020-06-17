@@ -143,7 +143,7 @@ public class FeedRepositoryTest {
 		assertNotNull(result.get());
 		assertEquals(result.get().getId(), feed1.getId());
 		assertFalse(Hibernate.isInitialized(result.get().getMember()));
-		System.out.println(result.get().getMember().getName());
+		result.get().getMember().getName(); // 초기화
 		assertTrue(Hibernate.isInitialized(result.get().getMember()));
 		assertFalse(Hibernate.isInitialized(result.get().getResources()));
 		assertFalse(Hibernate.isInitialized(result.get().getComments()));

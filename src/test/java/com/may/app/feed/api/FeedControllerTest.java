@@ -62,7 +62,6 @@ public class FeedControllerTest {
 	
 	@BeforeEach
 	public void setUp() throws Exception {
-		
 		mvc = MockMvcBuilders
 				.standaloneSetup(feedController)
 				.setControllerAdvice(controllerAdvice)
@@ -72,7 +71,6 @@ public class FeedControllerTest {
 	
 	/**
 	 * save() Test 성공
-	 * 피드 저장 성공 테스트
 	 */
 	@Test
 	public void 피드_저장_성공() throws Exception {
@@ -129,7 +127,6 @@ public class FeedControllerTest {
 	/**
 	 * save() Test 실패
 	 * 필수값이 없으면 bad request를 반환한다. 
-	 * @throws Exception
 	 */
 	@Test
 	public void 피드_저장_필수값_없음_실패() throws Exception {
@@ -167,19 +164,16 @@ public class FeedControllerTest {
 		)
 		.andDo(print())
 		.andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.name()))
-		.andReturn()
-		;
+		.andReturn();
 	}
 	
 	/**
 	 * find() Test 성공
-	 * 피드 상세 조회 
-	 * @throws Exception
 	 */
 	@Test
 	public void 피드_상세_조회_성공() throws Exception {
 		//given
-		given(feedService.detail(feed1.getId())).willReturn(feed1);
+		given(feedService.detail(feed1.getId(), null)).willReturn(new FeedDto.Get(feed1));
 		
 		//when & then
 		mvc.perform
@@ -201,8 +195,6 @@ public class FeedControllerTest {
 	
 	/**
 	 * list find() Test 성공
-	 * 피드 페이징 리스트 조회 
-	 * @throws Exception
 	 */
 	@Test
 	public void 피드_페이징_리스트_조회_성공() throws Exception {
@@ -230,7 +222,6 @@ public class FeedControllerTest {
 	
 	/**
 	 * list() Test 성공
-	 * @throws Exception
 	 */
 	@Test
 	public void 피드_페이징_리스트_데이터_없을때() throws Exception {
@@ -249,7 +240,6 @@ public class FeedControllerTest {
 	
 	/**
 	 * edit() Test 성공
-	 * @throws Exception
 	 */
 	@Test
 	public void 피드_수정_성공() throws Exception {
@@ -303,7 +293,6 @@ public class FeedControllerTest {
 	/**
 	 * edit() Test 실패
 	 * 필수값이 없으면 bad request를 반환한다. 
-	 * @throws Exception
 	 */
 	@Test
 	public void 피드_수정_필수값_없음_실패() throws Exception {
@@ -339,13 +328,11 @@ public class FeedControllerTest {
 		)
 		.andDo(print())
 		.andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.name()))
-		.andReturn()
-		;
+		.andReturn();
 	}
 	
 	/**
 	 * delete() Test 성공
-	 * @throws Exception
 	 */
 	@Test
 	public void 피드_삭제_성공() throws Exception {
@@ -366,7 +353,6 @@ public class FeedControllerTest {
 	/**
 	 * delete() Test 실패 
 	 * 피드 삭제 
-	 * @throws Exception
 	 */
 	@Test
 	public void 피드_삭제_실패() throws Exception {
@@ -380,8 +366,41 @@ public class FeedControllerTest {
 				.param("memberId", member1.getId().toString())
 		)
 		.andDo(print())
-		.andExpect(jsonPath("$.data").value(false))
-		;
+		.andExpect(jsonPath("$.data").value(false));
+	}
+	
+	/**
+	 * save() Test 성공 
+	 */
+	@Test
+	public void 피드_좋아요_성공() throws Exception {
+		//given
+		given(feedService.good(feed1.getId(), member1.getId())).willReturn(1L);
+		
+		//when & then
+		mvc.perform
+		(
+			post("/api/v1/feed/good/{id}", feed1.getId())
+				.param("memberId", member1.getId().toString())
+		)
+		.andExpect(jsonPath("$.data").value(true));
+	}
+	
+	/**
+	 * delete() Test 성공 
+	 */
+	@Test
+	public void 피드_좋아요_해제_성공() throws Exception {
+		//given
+		given(feedService.good(feed1.getId(), member1.getId())).willReturn(1L);
+		
+		//when & then
+		mvc.perform
+		(
+			delete("/api/v1/feed/good/{id}", feed1.getId())
+				.param("memberId", member1.getId().toString())
+		)
+		.andExpect(jsonPath("$.data").value(true));
 	}
 }
 

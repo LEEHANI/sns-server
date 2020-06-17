@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.may.app.common.CreateEntity;
 import com.may.app.follow.entity.Follow;
-import com.may.app.follow.exception.AlreadyFollowedException;
+import com.may.app.follow.exception.DuplicateFollowException;
 import com.may.app.follow.exception.NoFollowException;
 import com.may.app.member.MemoryMemberRepository;
 import com.may.app.member.entity.Member;
@@ -55,7 +55,7 @@ public class FollowServiceTest {
 		followRepository.save(follow);
 		
 		// when & then
-		assertThrows(AlreadyFollowedException.class, ()-> followService.follow(member1.getId(), member2.getId()));
+		assertThrows(DuplicateFollowException.class, ()-> followService.follow(member1.getId(), member2.getId()));
 	}
 	
 	/**
