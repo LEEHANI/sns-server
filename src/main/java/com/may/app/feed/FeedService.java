@@ -1,5 +1,6 @@
 package com.may.app.feed;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,7 +48,6 @@ public class FeedService {
 		String content, 
 		Long memberId, 
 		List<String> imgs, 
-		List<String> comments, 
 		List<String> tags, 
 		List<Long> itemIds
 	) {
@@ -56,7 +56,7 @@ public class FeedService {
 		List<Tag> tagsResult = saveTag(tags);
 		List<Item> itemsResult = itemRepository.findAllById(itemIds).stream().collect(Collectors.toList());
 		
-		Feed feed = Feed.createFeed(content, member, imgs, comments, tagsResult, itemsResult);
+		Feed feed = Feed.createFeed(content, member, imgs, tagsResult, itemsResult);
 		Feed result = feedRepository.save(feed);
 		
 		applicationEventPublisher.publishEvent(new FollowerPushedEvent(feed));

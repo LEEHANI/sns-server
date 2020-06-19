@@ -25,30 +25,28 @@ public class MemberServiceTest {
 	@MockBean private MemberRepository memberRepository;
 	@MockBean private FeedRepository feedRepository;
 	@MockBean private ItemRepository itemRepository;
-
-	Member member1 = CreateEntity.createMember(1L);
-	Feed feed1 = CreateEntity.createFeed
-			(
-				1L, 
-				member1, 
-				CreateEntity.createResources(1, true), 
-				CreateEntity.createComments(1, true), 
-				CreateEntity.createItems(1, member1, true), 
-				CreateEntity.createTags(0, 1, true)
-			);
-	Feed feed2 = CreateEntity.createFeed
-			(
-				2L, 
-				member1, 
-				CreateEntity.createResources(1, true), 
-				CreateEntity.createComments(1, true), 
-				CreateEntity.createItems(1, member1, true), 
-				CreateEntity.createTags(0, 1, true)
-			);
 	
 	@Test
 	public void 회원_상세_조회_성공() throws Exception {
 		//given
+		Member member1 = CreateEntity.createMember(1L);
+		Feed feed1 = CreateEntity.createFeed
+				(
+					1L, 
+					member1, 
+					CreateEntity.createResources(1, true), 
+					CreateEntity.createItems(1, member1, true), 
+					CreateEntity.createTags(0, 1, true)
+				);
+		Feed feed2 = CreateEntity.createFeed
+				(
+					2L, 
+					member1, 
+					CreateEntity.createResources(1, true), 
+					CreateEntity.createItems(1, member1, true), 
+					CreateEntity.createTags(0, 1, true)
+				);
+		
 		given(memberRepository.findById(member1.getId())).willReturn(Optional.of(member1));
 		given(feedRepository.findByMemberId(member1.getId())).willReturn(Lists.newArrayList(feed1, feed2));
 		
@@ -60,5 +58,4 @@ public class MemberServiceTest {
 		assertEquals(result.getFeeds().get(0).getId(), feed1.getId());
 		assertEquals(result.getFeeds().get(1).getId(), feed2.getId());
 	}
-	
 }

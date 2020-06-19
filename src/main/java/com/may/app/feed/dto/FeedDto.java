@@ -1,6 +1,7 @@
 package com.may.app.feed.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,10 +28,9 @@ public class FeedDto {
 		private String content;
 		@NotNull
 	    private Long memberId;
-	    private List<String> imgs;
-	    private List<String> comments;
-	    private List<String> tags;
-	    private List<Long> itemIds;
+	    private List<String> imgs = new ArrayList<>();
+	    private List<String> tags = new ArrayList<>();
+	    private List<Long> itemIds = new ArrayList<>();
 	}
 	
 	@Data
@@ -42,9 +42,9 @@ public class FeedDto {
 		private String content;
 		@NotNull
 		private Long memberId;
-	    private List<String> imgs;
-	    private List<String> tags;
-	    private List<Long> itemIds;
+	    private List<String> imgs = new ArrayList<>();
+	    private List<String> tags = new ArrayList<>();
+	    private List<Long> itemIds = new ArrayList<>();
 	}
 	
 	@Data

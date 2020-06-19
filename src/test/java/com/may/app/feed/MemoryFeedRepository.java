@@ -3,7 +3,6 @@ package com.may.app.feed;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -12,13 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
 
 import com.may.app.feed.entity.Feed;
 import com.may.app.feed.repository.FeedRepository;
-import com.may.app.tag.entity.Tag;
 
-import lombok.NoArgsConstructor;
 
 /**
  * fake repository

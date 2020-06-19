@@ -20,16 +20,6 @@ import com.may.app.member.entity.Member;
 import com.may.app.tag.entity.Tag;
 
 public class FeedDomainTest {
-	
-	Member member1 = CreateEntity.createMember(1L);
-	Member member2 = CreateEntity.createMember(2L);
-	List<Resource> resources = CreateEntity.createResources(2, true);
-	List<Comment> comments = CreateEntity.createComments(2, true);
-	List<Item> items = CreateEntity.createItems(2, member1, true);
-	List<Tag> tags = CreateEntity.createTags(0, 2, true);
-	
-	Feed feed1 = CreateEntity.createFeed(1L, member1, resources, comments, items, tags);
-	
 	@Test
 	public void 두개_리스트를_한쪽으로_필터링() throws Exception {
 		//given
@@ -48,6 +38,13 @@ public class FeedDomainTest {
 	@Test
 	public void 피드_수정_성공() throws Exception {
 		//given
+		Member member1 = CreateEntity.createMember(1L);
+		List<Resource> resources = CreateEntity.createResources(2, true);
+		List<Item> items = CreateEntity.createItems(2, member1, true);
+		List<Tag> tags = CreateEntity.createTags(0, 2, true);
+		
+		Feed feed1 = CreateEntity.createFeed(1L, member1, resources, items, tags);
+		
 		String content = "새로운 피드~";
 		List<String> editImgs = Lists.newArrayList(resources.get(0).getPath());
 		List<Tag> editTags = Lists.newArrayList(tags.get(0), tags.get(1), CreateEntity.createTag(100L)); 
@@ -67,13 +64,21 @@ public class FeedDomainTest {
 	
 	@Test
 	public void 피드_주인_확인_성공() throws Exception {
+		//given
+		Member member1 = CreateEntity.createMember(1L);
+		Feed feed1 = CreateEntity.createFeed(1L, member1, 0,0,0);
+		
 		//when & then
 		assertDoesNotThrow(() -> feed1.isOwner(member1.getId()));
 	}
 	
 	@Test
 	public void 피드_주인_확인_실패() throws Exception {
+		//given
+		Member member1 = CreateEntity.createMember(1L);
+		Feed feed1 = CreateEntity.createFeed(1L, member1, 0,0,0);
+		
 		//when & then
-		assertThrows(FeedOwnerMismatchException.class, ()-> feed1.isOwner(member2.getId()));
+		assertThrows(FeedOwnerMismatchException.class, ()-> feed1.isOwner(10L));
 	}
 }

@@ -14,7 +14,6 @@ import javax.transaction.Transactional;
 
 import org.assertj.core.util.Lists;
 import org.hibernate.Hibernate;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -24,9 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.may.app.common.CreateEntity;
-import com.may.app.feed.entity.Comment;
 import com.may.app.feed.entity.Feed;
-import com.may.app.feed.entity.Resource;
 import com.may.app.feed.repository.FeedRepository;
 import com.may.app.item.entity.Item;
 import com.may.app.item.repository.ItemRepository;
@@ -45,31 +42,24 @@ public class FeedRepositoryTest {
 	@Autowired private TagRepository tagRepository;
 	@Autowired private EntityManager em;
 	
-	Member member1 = CreateEntity.createMember(null);
-	Member member2 = CreateEntity.createMember(null);
-	
-	List<Tag> tags = CreateEntity.createTags(0, 2, false);
-	List<Item> items = CreateEntity.createItems(2, member1, false);
-	List<Resource> resources = CreateEntity.createResources(4, false);
-	List<Comment> comments = CreateEntity.createComments(2, false);
-	Feed feed1;
-	List<Feed> feeds;
-	
-	@BeforeEach
-	public void setUp() throws Exception { 
-		member1 = memberRepository.save(member1);
-		member2 = memberRepository.save(member2);
-		items = itemRepository.saveAll(items);
-		tags = tagRepository.saveAll(tags);
-		
-		feed1 = CreateEntity.createFeed(null, member1, resources, comments, items, tags);
-	}
-	
 	/**
 	 * feedRepository.save()
 	 */
 	@Test
 	public void 피드_추가_성공() throws Exception {
+		//given
+		Member member1 = memberRepository.save(CreateEntity.createMember(null));
+		List<Item> items = itemRepository.saveAll(CreateEntity.createItems(2, member1, false));
+		List<Tag> tags = tagRepository.saveAll( CreateEntity.createTags(0, 2, false));
+		Feed feed1 = CreateEntity.createFeed
+					(
+						null, 
+						member1, 
+						CreateEntity.createResources(4, false), 
+						items, 
+						tags
+					);
+		
 		//when
 		Feed result = feedRepository.save(feed1);
 		
@@ -78,7 +68,6 @@ public class FeedRepositoryTest {
 		assertEquals(result.getContent(), feed1.getContent());
 		assertEquals(result.getResources().size(), feed1.getResources().size());
 		assertEquals(result.getComments().size(), feed1.getComments().size());
-		assertEquals(result.getComments().get(0).getContent(), feed1.getComments().get(0).getContent());
 		assertEquals(result.getTags().size(), feed1.getTags().size());
 		assertEquals(result.getItems().size(), feed1.getItems().size());
 		assertEquals(result.getItems().get(0).getItem().getContent(), feed1.getItems().get(0).getItem().getContent());
@@ -87,12 +76,17 @@ public class FeedRepositoryTest {
 	@Test
 	public void 피드_페이징_조회_성공() throws Exception {
 		//given
-		Feed feed2 = CreateEntity.createFeed(null, member1, CreateEntity.createResources(2, false), CreateEntity.createComments(2, true), items, tags);
-		Feed feed3 = CreateEntity.createFeed(null, member1, CreateEntity.createResources(3, false), CreateEntity.createComments(2, true), items, tags);
-		Feed feed4 = CreateEntity.createFeed(null, member2, CreateEntity.createResources(1, false), CreateEntity.createComments(2, true), items, tags);
-		Feed feed5 = CreateEntity.createFeed(null, member2, CreateEntity.createResources(4, false), CreateEntity.createComments(2, true), items, tags);
-		feeds = Lists.newArrayList(feed1, feed2, feed3, feed4, feed5);
-		feeds = feedRepository.saveAll(feeds);
+		Member member1 = memberRepository.save(CreateEntity.createMember(null));
+		Member member2 = memberRepository.save(CreateEntity.createMember(null));
+		List<Item> items = itemRepository.saveAll(CreateEntity.createItems(2, member1, false));
+		List<Tag> tags = tagRepository.saveAll( CreateEntity.createTags(0, 2, false));
+		Feed feed1 = CreateEntity.createFeed(null, member1, CreateEntity.createResources(2, false), items, tags);
+		Feed feed2 = CreateEntity.createFeed(null, member1, CreateEntity.createResources(2, false), items, tags);
+		Feed feed3 = CreateEntity.createFeed(null, member1, CreateEntity.createResources(3, false), items, tags);
+		Feed feed4 = CreateEntity.createFeed(null, member2, CreateEntity.createResources(1, false), items, tags);
+		Feed feed5 = CreateEntity.createFeed(null, member2, CreateEntity.createResources(4, false), items, tags);
+		List<Feed> feeds = feedRepository.saveAll(Lists.newArrayList(feed1, feed2, feed3, feed4, feed5));
+		
 		Pageable pageable = PageRequest.of(1, 2);
 		
 		//쓰기 지연 저장소를 DB에 반영시키고 비우기 
@@ -118,7 +112,10 @@ public class FeedRepositoryTest {
 	@Test
 	public void 피드id와_회원id로_피드_조회_성공() throws Exception {
 		//given
-		feed1 = feedRepository.save(feed1);
+		Member member1 = memberRepository.save(CreateEntity.createMember(null));
+		List<Item> items = itemRepository.saveAll(CreateEntity.createItems(2, member1, false));
+		List<Tag> tags = tagRepository.saveAll( CreateEntity.createTags(0, 2, false));
+		Feed feed1 = feedRepository.save(CreateEntity.createFeed(null, member1, CreateEntity.createResources(2, false), items, tags));
 		
 		//when
 		Optional<Feed> result = feedRepository.findByIdAndMemberId(feed1.getId(), member1.getId());
@@ -131,7 +128,10 @@ public class FeedRepositoryTest {
 	@Test
 	public void 피드id와_회원id로_피드_lazy_조회_성공() throws Exception {
 		//given
-		feed1 = feedRepository.save(feed1);
+		Member member1 = memberRepository.save(CreateEntity.createMember(null));
+		List<Item> items = itemRepository.saveAll(CreateEntity.createItems(2, member1, false));
+		List<Tag> tags = tagRepository.saveAll( CreateEntity.createTags(0, 2, false));
+		Feed feed1 = feedRepository.save(CreateEntity.createFeed(null, member1, CreateEntity.createResources(2, false), items, tags));
 		
 		em.flush();
 		em.clear();
@@ -157,8 +157,11 @@ public class FeedRepositoryTest {
 	 */
 	@Test
 	public void 피드id와_회원id로_피드_조회_실패() throws Exception {
+		//given
+		Member member1 = memberRepository.save(CreateEntity.createMember(null));
+		
 		//when
-		Optional<Feed> result = feedRepository.findByIdAndMemberId(feed1.getId(), member1.getId());
+		Optional<Feed> result = feedRepository.findByIdAndMemberId(1L, member1.getId());
 		
 		//then
 		assertThat(result).isEmpty();
@@ -167,7 +170,10 @@ public class FeedRepositoryTest {
 	@Test
 	public void 피드_패치조인_회원_조회_성공() throws Exception {
 		//given
-		feed1 = feedRepository.save(feed1);
+		Member member1 = memberRepository.save(CreateEntity.createMember(null));
+		List<Item> items = itemRepository.saveAll(CreateEntity.createItems(2, member1, false));
+		List<Tag> tags = tagRepository.saveAll( CreateEntity.createTags(0, 2, false));
+		Feed feed1 = feedRepository.save(CreateEntity.createFeed(null, member1, CreateEntity.createResources(2, false), items, tags));
 		
 		em.flush();
 		em.clear();

@@ -10,14 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import com.may.app.common.CreateEntity;
 import com.may.app.member.entity.Member;
 import com.may.app.member.repository.MemberRepository;
-import com.may.app.tag.entity.Tag;
 
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
 public class MemoryMemberRepository implements MemberRepository {
 	private Map<Long, Member> members = new HashMap<>();
 	Long id = 0L;

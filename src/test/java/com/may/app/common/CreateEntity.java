@@ -2,7 +2,10 @@ package com.may.app.common;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.assertj.core.util.Lists;
 
 import com.may.app.feed.FeedResourceType;
 import com.may.app.feed.entity.Comment;
@@ -54,7 +57,6 @@ public class CreateEntity {
 		Long id, 
 		Member member, 
 		List<Resource> resources,
-		List<Comment> comments,
 		List<Item> items,
 		List<Tag> tags
 	) {
@@ -63,12 +65,11 @@ public class CreateEntity {
 				.id(id)
 				.content("피드내용"+(id==null?count:id))
 				.member(member)
-				.resources(resources)
-				.comments(comments)
+				.resources(resources==null ? new ArrayList<>() : resources)
 				.build();
 		
-		items.forEach(i-> feed.bind(FeedItem.builder().item(i).build()));
-		tags.forEach(t-> feed.bind(FeedTag.builder().tag(t).build()));
+		if(items==null) items=Lists.newArrayList(); else items.forEach(i-> feed.bind(FeedItem.builder().item(i).build()));
+		if(tags == null) items=Lists.newArrayList(); else tags.forEach(t-> feed.bind(FeedTag.builder().tag(t).build()));
 				
 		return feed;
 	}
@@ -78,7 +79,6 @@ public class CreateEntity {
 		Long id, 
 		Member member, 
 		int resourceCount, 
-		int commentCount, 
 		int itemCount, 
 		int tagCount
 	) {
@@ -87,7 +87,6 @@ public class CreateEntity {
 				.content("피드내용"+(id==null?count:id))
 				.member(member)
 				.resources(createResources(resourceCount, true))
-				.comments(createComments(commentCount, true))
 				.build();
 		createItems(itemCount, member, true).forEach(i-> feed.bind(FeedItem.builder().item(i).build()));
 		createTags(0, tagCount, true).forEach(t-> feed.bind(FeedTag.builder().tag(t).build()));
@@ -98,7 +97,7 @@ public class CreateEntity {
 	public static Tag createTag(Long id) {
 		return Tag.builder()
 				.id(id)
-				.title("태그"+(id==null?count++:id))
+				.title(UUID.randomUUID().toString())
 				.build();
 	}
 	

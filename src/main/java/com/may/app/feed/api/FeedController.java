@@ -1,5 +1,7 @@
 package com.may.app.feed.api;
 
+import java.util.ArrayList;
+
 import javax.validation.Valid;
 
 import org.springframework.data.domain.Page;
@@ -16,11 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.may.app.common.ResponseDto;
 import com.may.app.common.ResponseListDto;
 import com.may.app.feed.FeedService;
 import com.may.app.feed.dto.FeedDto;
 import com.may.app.feed.dto.FeedDto.Get;
 import com.may.app.feed.entity.Feed;
+import com.may.app.tag.entity.Tag;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,7 +45,6 @@ public class FeedController {
 			request.getContent(), 
 			request.getMemberId(), 
 			request.getImgs(), 
-			request.getComments(), 
 			request.getTags(), 
 			request.getItemIds()
 		);
@@ -93,23 +96,23 @@ public class FeedController {
 	}
 	
 	@DeleteMapping(value = "/{id}")
-	public ResponseListDto<Boolean> delete(@PathVariable Long id, @RequestParam Long memberId) {
+	public ResponseDto.Delete delete(@PathVariable Long id, @RequestParam Long memberId) {
 		Long result = feedService.delete(id, memberId);
 		
-		return new ResponseListDto<Boolean>(result==null? false: true);
+		return new ResponseDto.Delete(result==null? false: true);
 	}
 	
 	@PostMapping(value = "/good/{id}")
-	public ResponseListDto<Boolean> good(@PathVariable Long id, @RequestParam Long memberId) {
+	public ResponseDto.Good good(@PathVariable Long id, @RequestParam Long memberId) {
 		feedService.good(id, memberId);
 		
-		return new ResponseListDto<Boolean>(true);
+		return new ResponseDto.Good(true);
 	}
 	
 	@DeleteMapping(value = "/good/{id}")
-	public ResponseListDto<Boolean> unGood(@PathVariable Long id, @RequestParam Long memberId) {
+	public ResponseDto.UnGood unGood(@PathVariable Long id, @RequestParam Long memberId) {
 		feedService.unGood(id, memberId);
 		
-		return new ResponseListDto<Boolean>(true);
+		return new ResponseDto.UnGood(true);
 	} 
 }

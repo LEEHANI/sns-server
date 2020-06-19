@@ -79,21 +79,18 @@ public class Feed
 		String content, 
 		Member member, 
 		List<String> imgDtos, 
-		List<String> commentDtso, 
 		List<Tag> tags, 
 		List<Item> items
 	) {
 		Feed feed = new Feed();
 		
 		List<Resource> imgResult = imgDtos.stream().map(r-> new Resource(r)).collect(Collectors.toList());
-		List<Comment> commentResult = commentDtso.stream().map(c-> new Comment(c)).collect(Collectors.toList());
 		List<FeedTag> tagResult = tags.stream().map(t-> new FeedTag(feed, t)).collect(Collectors.toList());
 		List<FeedItem> itemResult = items.stream().map(i-> new FeedItem(feed, i)).collect(Collectors.toList());
 		
 		feed.content=content;
 		feed.member=member;
 		feed.resources=imgResult;
-		feed.comments=commentResult;
 		feed.tags=tagResult;
 		feed.items=itemResult;
 		

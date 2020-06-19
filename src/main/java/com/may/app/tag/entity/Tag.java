@@ -33,7 +33,7 @@ public class Tag
     private Long id;
 	
 	@NonNull
-	@Column(nullable = false, updatable = true, length = 20)
+	@Column(nullable = false, updatable = true)
 	private String title;
 	
 	public Tag(String title) {

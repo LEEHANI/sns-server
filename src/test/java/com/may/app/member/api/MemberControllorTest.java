@@ -27,15 +27,14 @@ import com.may.app.member.entity.Member;
 public class MemberControllorTest {
 	@Autowired private MockMvc mvc;
 	@MockBean private MemberService memberService;
-	
-	Member member1 = CreateEntity.createMember(1L);
-	Feed feed1 = CreateEntity.createFeed(1L, member1, 1, 1, 1, 1);
-	Feed feed2 = CreateEntity.createFeed(2L, member1, 1, 1, 1, 1);
-	
-	
+
 	@Test
 	public void 회원_상세_조회_성공() throws Exception {
 		//given
+		Member member1 = CreateEntity.createMember(1L);
+		Feed feed1 = CreateEntity.createFeed(1L, member1, 1, 1, 1);
+		Feed feed2 = CreateEntity.createFeed(2L, member1, 1, 1, 1);
+		
 		MemberDto.GetInfo dto = new MemberDto.GetInfo(member1, Lists.newArrayList(feed1, feed2).stream().map(FeedDto.Get::new).collect(Collectors.toList()));
 		given(memberService.detail(member1.getId())).willReturn(dto);
 		
