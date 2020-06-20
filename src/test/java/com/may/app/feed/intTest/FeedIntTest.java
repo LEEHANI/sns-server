@@ -55,7 +55,7 @@ public class FeedIntTest {
 		
 		FeedDto.Post request = FeedDto.Post
 				.builder()
-				.content ("피드내용")
+				.content ("feed content")
 				.memberId(member1.getId())
 				.imgs(Lists.newArrayList("img1"))
 				.tags(Lists.newArrayList(tags.get(0).getTitle()))

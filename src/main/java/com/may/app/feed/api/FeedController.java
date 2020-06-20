@@ -61,14 +61,10 @@ public class FeedController {
 	public Page<FeedDto.Get> list
 	(
 		@RequestParam(defaultValue = "0", required = false) int page, 
-		@RequestParam(defaultValue = "2", required = false) int size
+		@RequestParam(defaultValue = "2", required = false) int size, 
+		@RequestParam(required = false) Long requestMemberId
 	) {
-		Page<Feed> entities = feedService.list(PageRequest.of(page, size));
-
-		// open-session-in-view가 true라서 1차 캐시를 이용한 작업이 가능 !!
-		Page<Get> pages = entities.map(FeedDto.Get::new); 
-
-		return pages;
+		return feedService.list(PageRequest.of(page, size), requestMemberId);
 	}
 		
 	@PutMapping(value = "/{id}")

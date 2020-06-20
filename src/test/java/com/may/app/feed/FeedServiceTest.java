@@ -27,6 +27,7 @@ import org.springframework.data.redis.core.SetOperations;
 
 import com.may.app.common.CreateEntity;
 import com.may.app.feed.dto.FeedDto;
+import com.may.app.feed.dto.FeedDto.Get;
 import com.may.app.feed.entity.Feed;
 import com.may.app.feed.entity.Resource;
 import com.may.app.feed.exception.DuplicateFeedGoodFeedException;
@@ -176,7 +177,7 @@ public class FeedServiceTest {
 		given(feedRepository.findEntityGraphBy(Mockito.any(PageRequest.class))).willReturn(pageFeeds);
 		
 		//when
-		Page<Feed> result = feedService.list(PageRequest.of(0, 2));
+		Page<Get> result = feedService.list(PageRequest.of(0, 2), null);
 		
 		//then
 		assertNotNull(result);

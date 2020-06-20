@@ -15,6 +15,7 @@ import com.may.app.tag.TagDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,8 +29,11 @@ public class FeedDto {
 		private String content;
 		@NotNull
 	    private Long memberId;
+		@Default
 	    private List<String> imgs = new ArrayList<>();
+		@Default
 	    private List<String> tags = new ArrayList<>();
+		@Default
 	    private List<Long> itemIds = new ArrayList<>();
 	}
 	
@@ -42,8 +46,11 @@ public class FeedDto {
 		private String content;
 		@NotNull
 		private Long memberId;
+		@Default
 	    private List<String> imgs = new ArrayList<>();
+		@Default
 	    private List<String> tags = new ArrayList<>();
+		@Default
 	    private List<Long> itemIds = new ArrayList<>();
 	}
 	

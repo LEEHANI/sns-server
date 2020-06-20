@@ -189,15 +189,16 @@ public class FeedControllerTest {
 	public void 피드_페이징_리스트_조회_성공() throws Exception {
 		//given
 		Member member1 = CreateEntity.createMember(1L);
-		List<Feed> feeds = Lists.newArrayList
+		List<FeedDto.Get> feeds = Lists.newArrayList
 				(
-					CreateEntity.createFeed(1L, member1, 0, 0, 0),
-					CreateEntity.createFeed(2L, member1, 0, 0, 0),
-					CreateEntity.createFeed(3L, member1, 0, 0, 0),
-					CreateEntity.createFeed(4L, member1, 0, 0, 0)
+					new FeedDto.Get(CreateEntity.createFeed(1L, member1, 0, 0, 0)),
+					new FeedDto.Get(CreateEntity.createFeed(2L, member1, 0, 0, 0)),
+					new FeedDto.Get(CreateEntity.createFeed(3L, member1, 0, 0, 0)),
+					new FeedDto.Get(CreateEntity.createFeed(4L, member1, 0, 0, 0))
 				);
-		Page<Feed> pageFeeds = new PageImpl<>(feeds, PageRequest.of(1, 2), feeds.size());
-		given(feedService.list(Mockito.any())).willReturn(pageFeeds);
+		Page<FeedDto.Get> pageFeeds = new PageImpl<>(feeds, PageRequest.of(1, 2), feeds.size());
+		
+		given(feedService.list(Mockito.any(), Mockito.any())).willReturn(pageFeeds);
 
 		//when & then
 		mvc.perform
@@ -218,8 +219,8 @@ public class FeedControllerTest {
 	@Test
 	public void 피드_페이징_리스트_데이터_없을때() throws Exception {
 		//given
-		Page<Feed> pageFeeds = Page.empty(PageRequest.of(0, 2));
-		given(feedService.list(Mockito.any())).willReturn(pageFeeds);
+		Page<FeedDto.Get> pageFeeds = Page.empty(PageRequest.of(0, 2));
+		given(feedService.list(Mockito.any(), Mockito.any())).willReturn(pageFeeds);
 		
 		//when & then
 		mvc.perform(get("/api/v1/feed"))

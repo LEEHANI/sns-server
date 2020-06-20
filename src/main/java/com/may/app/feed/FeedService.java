@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.may.app.event.FollowerPushedEvent;
 import com.may.app.feed.dto.FeedDto;
 import com.may.app.feed.dto.GoodDto;
+import com.may.app.feed.dto.FeedDto.Get;
 import com.may.app.feed.entity.Feed;
 import com.may.app.feed.exception.DuplicateFeedGoodFeedException;
 import com.may.app.feed.exception.NoFeedException;
@@ -98,11 +99,11 @@ public class FeedService {
 	}
 	
 	@Transactional(readOnly = true)
-	public Page<Feed> list(PageRequest pageable) {
+	public Page<FeedDto.Get> list(PageRequest pageable, Long requestMemberId) {
 		// feed + XXToOne entity 조회
 		Page<Feed> feeds = feedRepository.findEntityGraphBy(pageable);
-		
-		return feeds;
+		Page<Get> pages = feeds.map(o-> new FeedDto.Get(o, goodCheck(o.getId(), requestMemberId))); 
+		return pages;
 	}
 	
 	@Transactional
