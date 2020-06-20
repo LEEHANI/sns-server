@@ -3,7 +3,9 @@ package com.may.app.feed.entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -108,7 +110,7 @@ public class Feed
 		editTags(tags);
 		editItems(items);
 		
-		this.content=content;
+		setContent(content);
 	}
 
 	private void editTags(List<Tag> tags) { 
@@ -127,8 +129,9 @@ public class Feed
 		List<Resource> removeResources = resources.stream().filter(o->!imgs.contains(o.getPath())).collect(Collectors.toList());
 		this.resources.removeAll(removeResources);
 		
-		Set<Resource> addResources = getResources().stream().filter(o->!imgs.contains(o)).collect(Collectors.toSet());
+		Set<Resource> addResources = imgs.stream().filter(o-> !getResources().contains(o)).map(Resource::new).collect(Collectors.toSet());
 		getResources().stream().collect(Collectors.toSet()).addAll(addResources);
+		if(getResources().isEmpty()) setResources(addResources.stream().collect(Collectors.toList()));
 	}
 	
 	private void editItems(List<Item> items) {
@@ -140,6 +143,10 @@ public class Feed
 		Set<Item> containItems = getItems().stream().map(o->o.getItem()).collect(Collectors.toSet());
 		Set<FeedItem> addItems = items.stream().filter(o->!containItems.contains(o)).map(i-> new FeedItem(this, i)).collect(Collectors.toSet());
 		addItems.stream().collect(Collectors.toSet()).forEach(o->bind(o));
+	}
+	
+	public void setContent(String content) {
+		if(content!=null) this.content = content;
 	}
 	
 	public void isOwner(Long memberId) {

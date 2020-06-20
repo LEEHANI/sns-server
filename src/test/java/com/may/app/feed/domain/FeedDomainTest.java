@@ -20,20 +20,6 @@ import com.may.app.member.entity.Member;
 import com.may.app.tag.entity.Tag;
 
 public class FeedDomainTest {
-	@Test
-	public void 두개_리스트를_한쪽으로_필터링() throws Exception {
-		//given
-		List<Integer> list1 = Lists.newArrayList(1,2,3);
-		List<Integer> list2 = Lists.newArrayList(3,4,5);
-		
-		//then
-		List<Integer> list3 = list1.stream().filter(o->!list2.contains(o)).collect(Collectors.toList());
-		List<Integer> list4 = list2.stream().filter(o->!list1.contains(o)).collect(Collectors.toList());
-		
-		//when
-		assertEquals(list3.size(), 2);
-		assertEquals(list4.size(), 2);
-	}
 	
 	@Test
 	public void 피드_수정_성공() throws Exception {
@@ -48,7 +34,7 @@ public class FeedDomainTest {
 		String content = "새로운 피드~";
 		List<String> editImgs = Lists.newArrayList(resources.get(0).getPath());
 		List<Tag> editTags = Lists.newArrayList(tags.get(0), tags.get(1), CreateEntity.createTag(100L)); 
-		List<Item> editItems = Lists.newArrayList(items.get(0), CreateEntity.createItem(101L, member1));
+		List<Item> editItems = CreateEntity.createItems(1, member1, true);
 		
 		//when
 		feed1.edit(content, editImgs, editTags, editItems);
@@ -60,6 +46,58 @@ public class FeedDomainTest {
 		assertEquals(feed1.getTags().size(), editTags.size());
 		assertEquals(feed1.getTags().get(2).getTag().getTitle(), editTags.get(2).getTitle());
 		assertEquals(feed1.getItems().size(), editItems.size());
+	}
+	
+	@Test
+	public void 피드_이미지만_수정_성공() throws Exception {
+		//given
+		Member member1 = CreateEntity.createMember(1L);
+		List<Resource> resources = CreateEntity.createResources(2, true);
+		
+		Feed feed1 = CreateEntity.createFeed(1L, member1, resources, null, null);
+		List<String> editImgs = Lists.newArrayList("new img");
+		
+		//when
+		feed1.edit("새로운 피드~", editImgs, Lists.newArrayList(), Lists.newArrayList());
+		
+		//then
+		assertEquals(feed1.getResources().size(), editImgs.size());
+		assertEquals(feed1.getResources().get(0).getPath(), editImgs.get(0));
+	}
+	
+	@Test
+	public void 피드_태그만_수정_성공() throws Exception {
+		//given
+		Member member1 = CreateEntity.createMember(1L);
+		List<Tag> tags = CreateEntity.createTags(0, 2, true);
+		
+		Feed feed1 = CreateEntity.createFeed(1L, member1, null, null, tags);
+		List<Tag> editTags = Lists.newArrayList(tags.get(1), CreateEntity.createTag(10L));
+		
+		//when
+		feed1.edit("새로운 피드~", Lists.newArrayList(), editTags, Lists.newArrayList());
+		
+		//then
+		assertEquals(feed1.getTags().size(), editTags.size());
+		assertEquals(feed1.getTags().get(0).getTag().getId(), editTags.get(0).getId());
+		assertEquals(feed1.getTags().get(1).getTag().getId(), editTags.get(1).getId());
+	}
+	
+	@Test
+	public void 피드_상품만_수정_성공() throws Exception {
+		//given
+		Member member1 = CreateEntity.createMember(1L);
+		List<Item> items = CreateEntity.createItems(2, member1, true);
+		
+		Feed feed1 = CreateEntity.createFeed(1L, member1, null, items, null);
+		
+		//when
+		feed1.edit("새로운 피드~", Lists.newArrayList(), Lists.newArrayList(), items);
+		
+		//then
+		assertEquals(feed1.getItems().size(), items.size());
+		assertEquals(feed1.getItems().get(0).getItem().getId(), items.get(0).getId());
+		assertEquals(feed1.getItems().get(1).getItem().getId(), items.get(1).getId());
 	}
 	
 	@Test

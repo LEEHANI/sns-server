@@ -25,13 +25,13 @@ import com.may.app.tag.entity.Tag;
  */
 public class CreateEntity {
 	
-	static int count = 1;
+	static int idCount = 1;
 	
 	public static Member createMember(Long id) {
 		return Member.builder()
 				.id(id)
-				.userId("멤버"+(id==null?count:id))
-				.name("멤버이름"+(id==null?count++:id))
+				.userId("member"+(id==null?idCount:id))
+				.name("name"+(id==null?idCount++:id))
 				.blocked(true)
 				.build();
 	}
@@ -47,7 +47,7 @@ public class CreateEntity {
 	public static Resource createResource(Long id) {
 		return Resource.builder()
 				.id(id)
-				.path("경로"+(id==null?count++:id))
+				.path("path"+(id==null?idCount++:id))
 				.type(FeedResourceType.PHOTO)
 				.build();
 	}
@@ -63,7 +63,7 @@ public class CreateEntity {
 		
 		Feed feed = Feed.builder()
 				.id(id)
-				.content("피드내용"+(id==null?count:id))
+				.content("content"+(id==null?idCount:id))
 				.member(member)
 				.resources(resources==null ? new ArrayList<>() : resources)
 				.build();
@@ -84,7 +84,7 @@ public class CreateEntity {
 	) {
 		Feed feed = Feed.builder()
 				.id(id)
-				.content("피드내용"+(id==null?count:id))
+				.content("content"+(id==null?idCount:id))
 				.member(member)
 				.resources(createResources(resourceCount, true))
 				.build();
@@ -104,15 +104,15 @@ public class CreateEntity {
 	public static Item createItem(Long id, Member member) {
 		return Item.builder()
 				.id(id)
-				.title("상품제목"+(id==null?count++:id))
-				.content("상품내용"+(id==null?count++:id))
+				.title("title"+(id==null?idCount++:id))
+				.content("content"+(id==null?idCount++:id))
 				.member(member)
 				.build();
 	}
 	
 	public static Comment createComment(Long id) {
 		return Comment.builder()
-				.content("댓글내용"+(id==null?count:id))
+				.content("comment"+(id==null?idCount:id))
 				.build();
 	}
 	
@@ -122,7 +122,7 @@ public class CreateEntity {
 		List<Comment> entities = new ArrayList<>();
 		
 		for(int i=0; i<count; i++) {
-			entities.add(createComment(needId?Long.valueOf(i):null));
+			entities.add(createComment(needId?Long.valueOf(idCount++):null));
 		}
 		
 		return entities;
@@ -132,7 +132,7 @@ public class CreateEntity {
 		List<Resource> entities = new ArrayList<>();
 		
 		for(int i=0; i<count; i++) {
-			entities.add(createResource(needId?Long.valueOf(i):null));
+			entities.add(createResource(needId?Long.valueOf(idCount++):null));
 		}
 		
 		return entities;
@@ -142,7 +142,7 @@ public class CreateEntity {
 		List<Item> entities = new ArrayList<>();
 		
 		for(int i=0; i<count; i++) {
-			entities.add(createItem(needId?Long.valueOf(i):null, member));
+			entities.add(createItem(needId?Long.valueOf(idCount++):null, member));
 		}
 		return entities;
 	}
@@ -151,7 +151,7 @@ public class CreateEntity {
 		List<Tag> entities = new ArrayList<>();
 		
 		for(int i=start; i<end; i++) {
-			entities.add(createTag(needId?Long.valueOf(i):null));
+			entities.add(createTag(needId?Long.valueOf(idCount++):null));
 		}
 		return entities;
 	}

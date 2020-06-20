@@ -90,7 +90,7 @@ public class FeedService {
 		return new FeedDto.Get(feed, good);
 	}
 	
-	public GoodDto goodCheck(Long feedId, Long memberId) {
+	private GoodDto goodCheck(Long feedId, Long memberId) {
 		Long count = redisTemplate.opsForSet().size(feedId.toString()); // O(1)
 		Boolean isGood = memberId==null? false : redisTemplate.opsForSet().isMember(feedId.toString(), memberId);
 		

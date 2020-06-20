@@ -41,7 +41,7 @@ public class TagRepositoryTest {
 	@Test
 	public void 제목으로_IN_검색_성공() {
 		//given
-		List<String> titles = new ArrayList<>(Arrays.asList("태그-1",tag1.getTitle(),tag2.getTitle()));
+		List<String> titles = new ArrayList<>(Arrays.asList("tagTest",tag1.getTitle(),tag2.getTitle()));
 		
 		//when
 		List<Tag> result = tagRepository.findByTitleIn(titles);

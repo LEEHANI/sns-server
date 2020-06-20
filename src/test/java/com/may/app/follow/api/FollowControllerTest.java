@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -31,20 +33,16 @@ public class FollowControllerTest {
 	@MockBean private FollowService followService;
 	@MockBean private FollowRepository followRepository;
 	
-	Member member1 = CreateEntity.createMember(1L);
-	Member member2 = CreateEntity.createMember(2L);
-	Member member3 = CreateEntity.createMember(3L);
-	
 	@Test
 	public void 팔로우_성공() throws Exception {
 		// given
-		given(followService.follow(member1.getId(), member2.getId())).willReturn(member1.getId());
+		given(followService.follow(Mockito.any(), Mockito.any())).willReturn(1L);
 		
 		// when & then
 		mvc.perform
 		(
-			post("/api/v1/follow/{id}", member1.getId())
-				.param("followingId", member2.getId().toString())
+			post("/api/v1/follow/{id}", 1)
+				.param("followingId", "2")
 		)
 		.andDo(print())
 		.andExpect(status().isOk())
@@ -55,14 +53,14 @@ public class FollowControllerTest {
 	@Test
 	public void 언팔로우_성공() throws Exception {
 		// given
-		given(followService.unfollow(member1.getId(), member2.getId())).willReturn(member1.getId());
+		given(followService.unfollow(Mockito.any(), Mockito.any())).willReturn(1L);
 		
 		// when & then
 		mvc.perform
 		(
 			post("/api/v1/follow/unfollow")
-				.param("id", member1.getId().toString())
-				.param("unfollowId", member2.getId().toString())
+				.param("id", "1")
+				.param("unfollowId", "2")
 		)
 		.andDo(print())
 		.andExpect(status().isOk())
@@ -77,32 +75,30 @@ public class FollowControllerTest {
 	@Test
 	public void 팔로잉_리스트_성공() throws Exception {
 		//given
-		List<Member> followings = Lists.newArrayList(member2, member3);
-		given(followRepository.findByFollowing(member1.getId())).willReturn(followings);
+		List<Member> members = Lists.newArrayList(CreateEntity.createMember(2L), CreateEntity.createMember(3L));
+		given(followRepository.findByFollowing(Mockito.any())).willReturn(members);
 		
 		//when & then
-		mvc.perform(get("/api/v1/follow/following/{id}", member1.getId()))
+		mvc.perform(get("/api/v1/follow/following/{id}", 1))
 		.andDo(print())
 		.andExpect(status().isOk())
 		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 		.andExpect(jsonPath("$.data.length()").value(2))
-		.andExpect(jsonPath("$.data[0].userId").value(member2.getUserId()))
-		.andExpect(jsonPath("$.data[0].name").value(member2.getName()))
-		.andExpect(jsonPath("$.data[1].userId").value(member3.getUserId()))
-		.andExpect(jsonPath("$.data[1].name").value(member3.getName()));
+		.andExpect(jsonPath("$.data[0].userId").value(members.get(0).getUserId()))
+		.andExpect(jsonPath("$.data[0].name").value(members.get(0).getName()))
+		.andExpect(jsonPath("$.data[1].userId").value(members.get(1).getUserId()))
+		.andExpect(jsonPath("$.data[1].name").value(members.get(1).getName()));
 	}
 	
 	@Test
 	public void 팔로잉_리스트_데이터_없을때() throws Exception {
 		//given
-		List<Member> followings = Lists.newArrayList();
-		given(followRepository.findByFollowing(1L)).willReturn(followings);
+		given(followRepository.findByFollowing(Mockito.any())).willReturn(Lists.newArrayList());
 		
 		//when & then
-		mvc.perform(get("/api/v1/follow/following/{id}", member1.getId()))
+		mvc.perform(get("/api/v1/follow/following/{id}", 1))
 		.andDo(print())
-		.andExpect(status().isOk())
-		;
+		.andExpect(status().isOk());
 	}
 
 	/**
@@ -112,17 +108,16 @@ public class FollowControllerTest {
 	@Test
 	public void 팔로워_리스트_성공() throws Exception {
 		//given
-		List<Member> followers = Lists.newArrayList(member2);
-		given(followRepository.findByFollower(member1.getId())).willReturn(followers);
+		List<Member> members = Lists.newArrayList(CreateEntity.createMember(2L));
+		given(followRepository.findByFollower(Mockito.any())).willReturn(members);
 		
 		//when & then
-		mvc.perform(get("/api/v1/follow/follower/{id}", member1.getId()))
+		mvc.perform(get("/api/v1/follow/follower/{id}", 1))
 		.andDo(print())
 		.andExpect(status().isOk())
 		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 		.andExpect(jsonPath("$.data.length()").value(1))
-		.andExpect(jsonPath("$.data[0].userId").value(member2.getUserId()))
-		.andExpect(jsonPath("$.data[0].name").value(member2.getName()))
-		;
+		.andExpect(jsonPath("$.data[0].userId").value(members.get(0).getUserId()))
+		.andExpect(jsonPath("$.data[0].name").value(members.get(0).getName()));
 	}
 }

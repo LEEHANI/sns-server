@@ -21,16 +21,9 @@ public class FollowServiceTest {
 	private MemoryMemberRepository memberRepository = new MemoryMemberRepository();
 	private MemoryFollowRepository followRepository = new MemoryFollowRepository();
 	
-	Member member1;
-	Member member2;
-	Follow follow;
-	
 	@BeforeEach
 	public void setUp() throws Exception {
 		followService = new FollowService(followRepository, memberRepository);
-		member1=memberRepository.save(CreateEntity.createMember(1L));
-		member2=memberRepository.save(CreateEntity.createMember(2L));
-		follow = CreateEntity.createFollow(1L, member1, member2);
 	}
 	
 	/**
@@ -38,10 +31,14 @@ public class FollowServiceTest {
 	 */
 	@Test
 	public void 팔로우_추가_정상() throws Exception {
-		// when
+		//given
+		Member member1=memberRepository.save(CreateEntity.createMember(1L));
+		Member member2=memberRepository.save(CreateEntity.createMember(2L));
+		
+		//when
 		Long result = followService.follow(member1.getId(), member2.getId());
 		
-		// then
+		//then
 		assertNotNull(result);
 	}
 	
@@ -52,7 +49,10 @@ public class FollowServiceTest {
 	@Test
 	public void 팔로우_추가_실패() throws Exception {
 		// given
-		followRepository.save(follow);
+		Member member1=memberRepository.save(CreateEntity.createMember(1L));
+		Member member2=memberRepository.save(CreateEntity.createMember(2L));
+		
+		followRepository.save(CreateEntity.createFollow(1L, member1, member2));
 		
 		// when & then
 		assertThrows(DuplicateFollowException.class, ()-> followService.follow(member1.getId(), member2.getId()));
@@ -65,6 +65,9 @@ public class FollowServiceTest {
 	@Order(value = 0)
 	@Test
 	public void 팔로우_없는_회원_실패() throws Exception {
+		//given
+		Member member1=memberRepository.save(CreateEntity.createMember(1L));
+		
 		// when & then
 		assertThrows(NoMemberException.class, ()-> followService.follow(member1.getId(), 3L));
 	}
@@ -76,7 +79,9 @@ public class FollowServiceTest {
 	@Test
 	public void 언팔로우_정상() throws Exception {
 		//given
-		followRepository.save(follow);
+		Member member1=memberRepository.save(CreateEntity.createMember(1L));
+		Member member2=memberRepository.save(CreateEntity.createMember(2L));
+		Follow follow = followRepository.save(CreateEntity.createFollow(1L, member1, member2));
 		
 		// when
 		Long result = followService.unfollow(member1.getId(), member2.getId());
@@ -93,6 +98,10 @@ public class FollowServiceTest {
 	 */
 	@Test
 	public void 언팔로우_실패() throws Exception {
+		//given
+		Member member1=memberRepository.save(CreateEntity.createMember(1L));
+		Member member2=memberRepository.save(CreateEntity.createMember(2L));
+		
 		// when & then
 		assertThrows(NoFollowException.class, ()->followService.unfollow(member1.getId(), member2.getId()));
 	}

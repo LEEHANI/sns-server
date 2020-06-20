@@ -6,10 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -18,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,7 +27,6 @@ import org.springframework.data.redis.core.SetOperations;
 
 import com.may.app.common.CreateEntity;
 import com.may.app.feed.dto.FeedDto;
-import com.may.app.feed.entity.Comment;
 import com.may.app.feed.entity.Feed;
 import com.may.app.feed.entity.Resource;
 import com.may.app.feed.exception.DuplicateFeedGoodFeedException;
@@ -56,44 +52,38 @@ public class FeedServiceTest {
 	@MockBean private RedisTemplate<String, Object> redisTemplate;
 	@MockBean private SetOperations<String, Object> setOperations;
 	
-	Member member1 = CreateEntity.createMember(1L);
-	Member member2 = CreateEntity.createMember(2L);
-	
-	List<Item> items = CreateEntity.createItems(2, member1, true);
-	List<Tag> tags = CreateEntity.createTags(0,2, true);
-	List<Resource> resources = CreateEntity.createResources(4, true);
-	List<Comment> comments = CreateEntity.createComments(3, true);
-	
-	Feed feed1 = CreateEntity.createFeed(1L, member1, resources, comments, items, tags);
-	
 	@BeforeEach
 	public void setUp() throws Exception{
-		given(memberRepository.findById(member1.getId())).willReturn(Optional.of(member1));
-		
 		when(redisTemplate.opsForSet()).thenReturn(setOperations);
 	}
 	
 	/**
-	 * feedService.add() 성공
-	 * tags중 [0,1]는 이미 저장되어있는 태그, [2,3]은 새로 저장할 태그
+	 * save() Test 성공
+	 * request로 tags[0,1,2,3]를 보낸다. 
+	 * tags중 [0,1]는 이미 저장되어있는 태그, [2,3]은 새로 저장해야할 태그라고 가정하면, feed는 4개가 모두 저장되어야 한다.  
 	 */
 	@Test
 	public void 피드_추가_성공() throws Exception {
 		//given
-		List<Tag> tags = CreateEntity.createTags(2,4, true);
-		given(tagRepository.findByTitleIn(Mockito.any())).willReturn(tags);
+		Member member1 = CreateEntity.createMember(1L);
+		List<Resource> resources = CreateEntity.createResources(4, true);
+		List<Tag> existTags = CreateEntity.createTags(0,2, true);
+		List<Tag> newTags = CreateEntity.createTags(2,4, true);
+		List<Item> items = CreateEntity.createItems(2, member1, true);
+		
+		given(memberRepository.findById(Mockito.any())).willReturn(Optional.of(member1));
+		given(tagRepository.findByTitleIn(Mockito.any())).willReturn(existTags);
 		given(itemRepository.findAllById(Mockito.any())).willReturn(items);
-		given(tagRepository.saveAll(Mockito.any())).willReturn(tags);
-		this.tags.addAll(tags);
+		given(tagRepository.saveAll(Mockito.any())).willReturn(newTags);
+		existTags.addAll(newTags);
 		
 		//when
 		feedService.add
 		(
-			"피드 수정합니다~", 
+			"피드 추가합니다~", 
 			member1.getId(), 
 			resources.stream().map(o->o.getPath().toString()).collect(Collectors.toList()), 
-			comments.stream().map(o->o.getContent().toString()).collect(Collectors.toList()), 
-			this.tags.stream().map(o->o.getTitle().toString()).collect(Collectors.toList()), 
+			existTags.stream().map(o->o.getTitle().toString()).collect(Collectors.toList()), 
 			items.stream().map(o->o.getId().longValue()).collect(Collectors.toList())
 		);
 		
@@ -105,7 +95,6 @@ public class FeedServiceTest {
 		//then
 		assertNotNull(result);
 		assertEquals(result.getTags().size(), 4);
-		assertEquals(result.getComments().size(), comments.size());
 		assertEquals(result.getItems().size(), items.size());
 		assertEquals(result.getItems().get(0).getItem().getTitle(), items.get(0).getTitle());
 	}
@@ -117,7 +106,7 @@ public class FeedServiceTest {
 	@Test
 	public void 피드_추가_실패() throws Exception {
 		//when & then
-		assertThrows(NoMemberException.class, () -> feedService.add("피드내용", member2.getId(), null, null, null, null));
+		assertThrows(NoMemberException.class, () -> feedService.add("피드내용", 2L, null, null, null));
 	}
 	
 	/**
@@ -126,8 +115,10 @@ public class FeedServiceTest {
 	@Test
 	public void 피드_상세_조회_성공() throws Exception {
 		//given
+		Feed feed1 = CreateEntity.createFeed(1L, CreateEntity.createMember(1L), 1,1,1);
+		
 		given(feedRepository.findById(Mockito.any())).willReturn(Optional.of(feed1));
-		when(redisTemplate.opsForSet().size(Mockito.any())).thenReturn(2L);
+		given(redisTemplate.opsForSet().size(Mockito.any())).willReturn(2L);
 		
 		//when
 		FeedDto.Get result = feedService.detail(feed1.getId(), null);
@@ -136,7 +127,26 @@ public class FeedServiceTest {
 		assertNotNull(result);
 		assertEquals(result.getContent(), feed1.getContent());
 		assertEquals(result.getItems().size(), feed1.getItems().size());
-		assertEquals(result.getComments().get(1).getContent(), feed1.getComments().get(1).getContent());
+		assertEquals(result.getTags().size(), feed1.getTags().size());
+		assertEquals(result.getComments().size(), 0);
+	}
+	
+	@Test
+	public void 피드_상세_조회_좋아요_성공() throws Exception {
+		//given
+		Feed feed1 = CreateEntity.createFeed(1L, CreateEntity.createMember(1L), 1,1,1);
+		
+		given(feedRepository.findById(Mockito.any())).willReturn(Optional.of(feed1));
+		given(redisTemplate.opsForSet().size(Mockito.any())).willReturn(2L);
+		given(redisTemplate.opsForSet().isMember(Mockito.any(), Mockito.any())).willReturn(true);
+		
+		//when
+		FeedDto.Get result = feedService.detail(feed1.getId(), 1L);
+		
+		//then
+		assertNotNull(result);
+		assertEquals(result.getIsGood(), true);
+		assertEquals(result.getGoodCount(), 2L);
 	}
 
 	/**
@@ -155,9 +165,10 @@ public class FeedServiceTest {
 	@Test
 	public void 피드_페이지_리스트_조회_성공() throws Exception {
 		//given
+		Member member1 = CreateEntity.createMember(1L);
 		Page<Feed> pageFeeds = new PageImpl<>
 		(
-			Lists.newArrayList(feed1, CreateEntity.createFeed(2L,null,0,0,0,0), CreateEntity.createFeed(2L,null,0,0,0,0)), 
+			Lists.newArrayList(CreateEntity.createFeed(1L,member1,0,0,0), CreateEntity.createFeed(2L,member1,0,0,0), CreateEntity.createFeed(2L,member1,0,0,0)), 
 			PageRequest.of(0, 2), 
 			3
 		);
@@ -179,6 +190,12 @@ public class FeedServiceTest {
 	@Test
 	public void 피드_수정_성공() throws Exception {
 		//given
+		Member member1 = CreateEntity.createMember(1L);
+		List<Item> items = CreateEntity.createItems(2, member1, true);
+		List<Tag> tags = CreateEntity.createTags(0,2, true);
+		List<Resource> resources = CreateEntity.createResources(4, true);
+		Feed feed1 = CreateEntity.createFeed(1L, member1, resources, items, tags);
+		
 		given(tagRepository.findByTitleIn(Mockito.any())).willReturn(Lists.newArrayList(tags.get(0)));
 		given(itemRepository.findAllById(Mockito.any())).willReturn(Lists.newArrayList(items.get(0)));
 		given(tagRepository.saveAll(Mockito.any())).willReturn(CreateEntity.createTags(2,4, true));
@@ -210,6 +227,8 @@ public class FeedServiceTest {
 	@Test
 	public void 피드_수정_전부_제로_리스트_성공() throws Exception {
 		//given
+		Feed feed1 = CreateEntity.createFeed(1L, CreateEntity.createMember(1L), 1,1,1);
+		Member member1 = CreateEntity.createMember(1L);
 		given(feedRepository.findFetchMemberById(Mockito.any())).willReturn(Optional.of(feed1));
 		
 		//when
@@ -229,10 +248,12 @@ public class FeedServiceTest {
 	@Test
 	public void 피드_수정_실패() throws Exception {
 		//given
+		Feed feed1 = CreateEntity.createFeed(1L, CreateEntity.createMember(1L), 0,0,0);
+		
 		given(feedRepository.findFetchMemberById(Mockito.any())).willReturn(Optional.of(feed1));
 		
 		//when & then
-		assertThrows(FeedOwnerMismatchException.class, ()-> feedService.edit(feed1.getId(), null, member2.getId(), null, null, null));
+		assertThrows(FeedOwnerMismatchException.class, ()-> feedService.edit(feed1.getId(), null, 2L, null, null, null));
 	}
 	
 	/**
@@ -241,6 +262,8 @@ public class FeedServiceTest {
 	@Test
 	public void 피드_삭제_성공() throws Exception {
 		//given
+		Feed feed1 = CreateEntity.createFeed(1L, CreateEntity.createMember(1L), 1,1,1);
+		Member member1 = CreateEntity.createMember(1L);
 		given(feedRepository.findFetchMemberById(Mockito.any())).willReturn(Optional.of(feed1));
 		
 		//when
@@ -258,7 +281,7 @@ public class FeedServiceTest {
 	@Test
 	public void 피드_삭제_실패() throws Exception {
 		//when & then
-		assertThrows(NoFeedException.class, ()-> feedService.delete(2L, member1.getId()));
+		assertThrows(NoFeedException.class, ()-> feedService.delete(2L, 1L));
 	}
 	
 	/**
@@ -267,6 +290,9 @@ public class FeedServiceTest {
 	@Test
 	public void 피드_좋아요_성공() throws Exception {
 		//given
+		Member member1 = CreateEntity.createMember(1L);
+		Feed feed1 = CreateEntity.createFeed(1L, CreateEntity.createMember(1L), 1,1,1);
+		
 		given(feedRepository.findById(Mockito.anyLong())).willReturn(Optional.of(feed1));
 		given(memberRepository.findById(Mockito.anyLong())).willReturn(Optional.of(member1));
 		given(setOperations.add(Mockito.anyString(), Mockito.anyObject())).willReturn(1L);
@@ -285,6 +311,9 @@ public class FeedServiceTest {
 	@Test
 	public void 피드_좋아요_실패() throws Exception {
 		//given
+		Member member1 = CreateEntity.createMember(1L);
+		Feed feed1 = CreateEntity.createFeed(1L, CreateEntity.createMember(1L), 1,1,1);
+		
 		given(feedRepository.findById(Mockito.anyLong())).willReturn(Optional.of(feed1));
 		given(memberRepository.findById(Mockito.anyLong())).willReturn(Optional.of(member1));
 		given(setOperations.add(Mockito.anyString(), Mockito.anyObject())).willReturn(0L);
@@ -299,6 +328,9 @@ public class FeedServiceTest {
 	@Test
 	public void 피드_좋아요_해제_성공() throws Exception {
 		//given
+		Member member1 = CreateEntity.createMember(1L);
+		Feed feed1 = CreateEntity.createFeed(1L, CreateEntity.createMember(1L), 1,1,1);
+		
 		given(feedRepository.findById(Mockito.anyLong())).willReturn(Optional.of(feed1));
 		given(memberRepository.findById(Mockito.anyLong())).willReturn(Optional.of(member1));
 		given(setOperations.remove(Mockito.anyString(), Mockito.anyObject())).willReturn(1L);
@@ -317,6 +349,9 @@ public class FeedServiceTest {
 	@Test
 	public void 피드_좋아요_해제_실패() throws Exception {
 		//given
+		Member member1 = CreateEntity.createMember(1L);
+		Feed feed1 = CreateEntity.createFeed(1L, CreateEntity.createMember(1L), 1,1,1);
+		
 		given(feedRepository.findById(Mockito.anyLong())).willReturn(Optional.of(feed1));
 		given(memberRepository.findById(Mockito.anyLong())).willReturn(Optional.of(member1));
 		
