@@ -1,7 +1,10 @@
 plugins {
 	id 'org.springframework.boot' version '2.3.0.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+	id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
+	id 'io.franzbecker.gradle-lombok' version '1.14'
 	id 'java'
+	id 'idea'
 }
 
 group = 'com.may'
@@ -29,6 +32,11 @@ dependencies {
 	runtimeOnly 'mysql:mysql-connector-java'
 	testCompile 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
+	compile 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.6.1'
+	
+	compile 'com.querydsl:querydsl-jpa'
+	compile 'com.querydsl:querydsl-apt'
+	
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
@@ -37,3 +45,25 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+def querydslSrcDir = 'src/main/generated'
+querydsl {
+	library = "com.querydsl:querydsl-apt"
+	jpa = true
+	querydslSourcesDir = querydslSrcDir
+}	
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src/main/java', querydslSrcDir]
+		}
+	}
+}
+
+
