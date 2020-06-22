@@ -129,7 +129,6 @@ public class FeedServiceTest {
 		assertEquals(result.getContent(), feed1.getContent());
 		assertEquals(result.getItems().size(), feed1.getItems().size());
 		assertEquals(result.getTags().size(), feed1.getTags().size());
-		assertEquals(result.getComments().size(), 0);
 	}
 	
 	@Test
@@ -177,7 +176,7 @@ public class FeedServiceTest {
 		given(feedRepository.findEntityGraphBy(Mockito.any(PageRequest.class))).willReturn(pageFeeds);
 		
 		//when
-		Page<Get> result = feedService.list(PageRequest.of(0, 2), null);
+		Page<FeedDto.GetList> result = feedService.list(PageRequest.of(0, 2), null);
 		
 		//then
 		assertNotNull(result);

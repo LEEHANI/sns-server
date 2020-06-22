@@ -1,11 +1,11 @@
 package com.may.app.feed;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,12 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.may.app.event.FollowerPushedEvent;
 import com.may.app.feed.dto.FeedDto;
+import com.may.app.feed.dto.FeedDto.GetList;
 import com.may.app.feed.dto.GoodDto;
-import com.may.app.feed.dto.FeedDto.Get;
+import com.may.app.feed.entity.Comment;
 import com.may.app.feed.entity.Feed;
 import com.may.app.feed.exception.DuplicateFeedGoodFeedException;
 import com.may.app.feed.exception.NoFeedException;
 import com.may.app.feed.exception.NoFeedGoodException;
+import com.may.app.feed.repository.CommentRepository;
 import com.may.app.feed.repository.FeedRepository;
 import com.may.app.item.entity.Item;
 import com.may.app.item.repository.ItemRepository;
@@ -39,6 +41,7 @@ public class FeedService {
 	private final MemberRepository memberRepository;
 	private final ItemRepository itemRepository;
 	private final TagRepository tagRepository;
+	private final CommentRepository commentRepository;
 	private final ApplicationEventPublisher applicationEventPublisher;
 	private final RedisTemplate<String, Object> redisTemplate;
 	
@@ -99,10 +102,11 @@ public class FeedService {
 	}
 	
 	@Transactional(readOnly = true)
-	public Page<FeedDto.Get> list(PageRequest pageable, Long requestMemberId) {
+	@Cacheable(cacheNames = "feeds", key="#pageable")
+	public Page<FeedDto.GetList> list(PageRequest pageable, Long requestMemberId) {
 		// feed + XXToOne entity 조회
 		Page<Feed> feeds = feedRepository.findEntityGraphBy(pageable);
-		Page<Get> pages = feeds.map(o-> new FeedDto.Get(o, goodCheck(o.getId(), requestMemberId))); 
+		Page<GetList> pages = feeds.map(o-> new FeedDto.GetList(o, goodCheck(o.getId(), requestMemberId))); 
 		return pages;
 	}
 	

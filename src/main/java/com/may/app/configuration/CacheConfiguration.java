@@ -36,9 +36,9 @@ public class CacheConfiguration {
 	    return (builder) -> builder
 	            .withCacheConfiguration("members",
 	                    RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofDays(15))
-	                    .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.json())));
-//	            .withCacheConfiguration("cache2",
-//	                    RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(1)));
+	                    .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.json())))
+	            .withCacheConfiguration("feeds",
+	                    RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(5)));
 	    
 	}
 	

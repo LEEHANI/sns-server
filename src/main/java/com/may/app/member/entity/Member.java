@@ -22,7 +22,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @EqualsAndHashCode
-@BatchSize(size = 100)
 public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

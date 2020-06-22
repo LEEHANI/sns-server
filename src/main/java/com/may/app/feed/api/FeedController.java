@@ -1,13 +1,10 @@
 package com.may.app.feed.api;
 
-import java.util.ArrayList;
-
 import javax.validation.Valid;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,12 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.may.app.common.ResponseDto;
-import com.may.app.common.ResponseListDto;
 import com.may.app.feed.FeedService;
+import com.may.app.feed.dto.CommentDto;
 import com.may.app.feed.dto.FeedDto;
-import com.may.app.feed.dto.FeedDto.Get;
+import com.may.app.feed.entity.Comment;
 import com.may.app.feed.entity.Feed;
-import com.may.app.tag.entity.Tag;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,7 +54,7 @@ public class FeedController {
 	}
 
 	@GetMapping(value = "")
-	public Page<FeedDto.Get> list
+	public Page<FeedDto.GetList> list
 	(
 		@RequestParam(defaultValue = "0", required = false) int page, 
 		@RequestParam(defaultValue = "2", required = false) int size, 

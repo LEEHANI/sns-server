@@ -51,30 +51,27 @@ public class Feed
 	@Column(nullable = true, updatable = true, length = 500)
 	private String content;
 	
-	@BatchSize(size = 100)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(nullable = false, updatable = true, name = "member_id")
 	private Member member;
 	
-	@BatchSize(size = 100)
 	@Default
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "feed_id")
 	private List<Resource> resources = new ArrayList<>();
 	
-	@BatchSize(size = 100)
 	@Default
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "feed")
 	private List<FeedItem> items = new ArrayList<>();
 	
-	@BatchSize(size = 100)
 	@Default
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "feed")
 	private List<FeedTag> tags = new ArrayList<>();
 	
-	@BatchSize(size = 100)
-	@Default
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL,  orphanRemoval = true)
-	private List<Comment> comments = new ArrayList<>();
+//	@Default
+//	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL,  orphanRemoval = true)
+//	@JoinColumn(name = "feed_id")
+//	private List<Comment> comments = new ArrayList<>();
 	
 	public static Feed createFeed 
 	(
@@ -111,6 +108,10 @@ public class Feed
 		editItems(items);
 		
 		setContent(content);
+	}
+	
+	public void setTest(List<FeedTag> list) {
+		setTags(list);
 	}
 
 	private void editTags(List<Tag> tags) { 

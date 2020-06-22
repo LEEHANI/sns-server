@@ -34,7 +34,6 @@ import lombok.Setter;
 	}
 )
 @Entity
-@BatchSize(size = 100)
 public class FeedItem {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
