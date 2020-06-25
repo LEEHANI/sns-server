@@ -44,6 +44,21 @@ public class CreateEntity {
 				.build();
 	}
 	
+	public static Comment createComment(Long id, Member member, Feed feed, Comment parent) {
+		return createCommentWithChildren(id, member, feed, parent, null);
+	}
+	
+	public static Comment createCommentWithChildren(Long id, Member member, Feed feed, Comment parent, List<Comment> children) {
+		return Comment.builder()
+				.id(id)
+				.content("content"+(id==null?idCount++:id))
+				.member(member)
+				.feed(feed)
+				.parent(parent)
+				.children(children==null?Lists.newArrayList():children)
+				.build();
+	}
+	
 	public static Resource createResource(Long id) {
 		return Resource.builder()
 				.id(id)
@@ -110,23 +125,17 @@ public class CreateEntity {
 				.build();
 	}
 	
-	public static Comment createComment(Long id) {
-		return Comment.builder()
-				.content("comment"+(id==null?idCount:id))
-				.build();
-	}
-	
 	// 컨트롤러, 서비스에서는 id를 사용하는 경우가 많음
 	// 레파지토리에서는 id를 사용하지 않는 경우가 많음
-	public static List<Comment> createComments(int count, boolean needId) {
-		List<Comment> entities = new ArrayList<>();
-		
-		for(int i=0; i<count; i++) {
-			entities.add(createComment(needId?Long.valueOf(idCount++):null));
-		}
-		
-		return entities;
-	}
+//	public static List<Comment> createComments(int count, boolean needId) {
+//		List<Comment> entities = new ArrayList<>();
+//		
+//		for(int i=0; i<count; i++) {
+//			entities.add(createComment(needId?Long.valueOf(idCount++):null));
+//		}
+//		
+//		return entities;
+//	}
 	
 	public static List<Resource> createResources(int count, boolean needId) {
 		List<Resource> entities = new ArrayList<>();

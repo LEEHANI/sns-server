@@ -6,7 +6,7 @@ java8, Spring Boot, Gradle, Spring Data JPA, MySQL, Spring Data Redis
 
 ## 규칙
 - 계층
-  + DTO 변환은 되도록 controller에서 진행하지만, 어쩔 수 없는 경우 service에서도 허용한다. (ex) memberService.detail())
+  + DTO 변환은 되도록 controller에서 진행하지만, 어쩔 수 없는 경우 service에서도 허용한다.
   + 로직이 없으면 컨트롤러에서 repository 호출 가능
   + 서비스간 호출은 허용 안함. 무한 호출이 발생할 수 있기 때문에 
 - 테스트 
@@ -23,7 +23,11 @@ java8, Spring Boot, Gradle, Spring Data JPA, MySQL, Spring Data Redis
   4. 피드 목록을 조회할 수 있다. 
   5. 피드를 상세 조회할 수 있다.
   6. 회원은 피드 좋아요를 할 수 있다.
-  7. 회원은 피드 좋아요 해제를 할 수 있다. 
+  7. 회원은 피드 좋아요 해제를 할 수 있다.
+  
+  8. 댓글 등록
+  9. 대댓글 등록 
+   
 - 팔로우
   1. 회원은 팔로우 할 수 있다.
   2. 회원은 언팔로우 할 수 있다.
@@ -31,21 +35,20 @@ java8, Spring Boot, Gradle, Spring Data JPA, MySQL, Spring Data Redis
   4. 팔로워 목록을 조회할 수 있다. 
 - 회원  
   1. 회원을 상세 조회할 수 있다. 
-    
 - 기타   
-  1. 비동기 푸쉬 알림
+  1. 푸쉬는 비동기로 처리
 
 ## 집중 요소 
 - 성능 최적화 
-  + 서버 부하를 줄이기 위해 자주 조회되는 API는 redis 캐시 사용
+  + 서버 부하를 줄이기 위해 자주 조회되는 API는  캐시 사용
   + 트래픽이 많이 발생하는 피드 좋아요는 redis 저장소 사용
   + DB와 통신을 최소화하기 위해 fetch join, batch size 사용 
-- 기타     
-  + 테스트가 가능한 설계 (어떤걸?)
-  + 지속적인 리팩토링 
-  + 주요 기능은 도메인에서 진행 
 - 테스트 
   + Mock을 이용한 Unit test 
   + JPA lazy loading 테스트
   + 통합테스트  
   + 외부 API 테스트 (예정)
+- 기타     
+  + 테스트가 가능한 설계 (어떤걸?)
+  + 지속적인 리팩토링 
+  + 주요 기능은 도메인에서 진행 

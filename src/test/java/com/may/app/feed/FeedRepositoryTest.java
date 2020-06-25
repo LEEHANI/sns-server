@@ -67,7 +67,6 @@ public class FeedRepositoryTest {
 		assertNotNull(result);
 		assertEquals(result.getContent(), feed1.getContent());
 		assertEquals(result.getResources().size(), feed1.getResources().size());
-		assertEquals(result.getComments().size(), feed1.getComments().size());
 		assertEquals(result.getTags().size(), feed1.getTags().size());
 		assertEquals(result.getItems().size(), feed1.getItems().size());
 		assertEquals(result.getItems().get(0).getItem().getContent(), feed1.getItems().get(0).getItem().getContent());
@@ -146,7 +145,6 @@ public class FeedRepositoryTest {
 		result.get().getMember().getName(); // 초기화
 		assertTrue(Hibernate.isInitialized(result.get().getMember()));
 		assertFalse(Hibernate.isInitialized(result.get().getResources()));
-		assertFalse(Hibernate.isInitialized(result.get().getComments()));
 		assertFalse(Hibernate.isInitialized(result.get().getItems()));
 	}
 	
@@ -186,7 +184,6 @@ public class FeedRepositoryTest {
 		assertEquals(result.get().getId(), feed1.getId());
 		assertTrue(Hibernate.isInitialized(result.get().getMember()));
 		assertFalse(Hibernate.isInitialized(result.get().getResources()));
-		assertFalse(Hibernate.isInitialized(result.get().getComments()));
 		assertFalse(Hibernate.isInitialized(result.get().getItems()));
 	}
 	

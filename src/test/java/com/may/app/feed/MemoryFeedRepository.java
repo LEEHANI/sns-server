@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import com.may.app.feed.dto.FeedDto.Get;
 import com.may.app.feed.entity.Feed;
 import com.may.app.feed.repository.FeedRepository;
 
@@ -51,7 +52,6 @@ public class MemoryFeedRepository implements FeedRepository{
 				.content(entity.getContent())
 				.member(entity.getMember())
 				.resources(entity.getResources())
-				.comments(entity.getComments())
 				.build();
 		
 		feeds.put(entity.getId(), entity);
@@ -202,4 +202,17 @@ public class MemoryFeedRepository implements FeedRepository{
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public Optional<Feed> findDetailById(Long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Get findDetailDtoById(Feed feed) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

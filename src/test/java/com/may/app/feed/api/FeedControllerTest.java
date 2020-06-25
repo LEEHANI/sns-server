@@ -76,24 +76,14 @@ public class FeedControllerTest {
 		
 		FeedDto.Post request = FeedDto.Post
 				.builder()
-				.content ("피드내용")
+				.content (feed1.getContent())
 				.memberId(member1.getId())
 				.imgs(Lists.newArrayList(feed1.getResources().get(0).getPath()))
 				.tags(Lists.newArrayList(feed1.getTags().get(0).getTag().getTitle()))
 				.itemIds(Lists.newArrayList(feed1.getItems().get(0).getItem().getId()))
 				.build();
 		
-		given
-		(
-			feedService.add
-			(
-				request.getContent(), 
-				request.getMemberId(), 
-				request.getImgs(), 
-				request.getTags(), 
-				request.getItemIds()
-			)
-		).willReturn(feed1);
+		given(feedService.add(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(feed1);
 		
 		//when & then
 		mvc.perform
@@ -126,17 +116,7 @@ public class FeedControllerTest {
 				.memberId(member1.getId())
 				.build();
 		
-		given
-		(
-			feedService.add
-			(
-				request.getContent(), 
-				request.getMemberId(), 
-				request.getImgs(), 
-				request.getTags(), 
-				request.getItemIds()
-			)
-		).willReturn(feed1);
+		given(feedService.add(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(feed1);
 		
 		//when & then
 		mvc.perform
@@ -146,8 +126,7 @@ public class FeedControllerTest {
 				.content(objMapper.writeValueAsString(request))
 		)
 		.andDo(print())
-		.andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.name()))
-		.andReturn();
+		.andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.name()));
 	}
 	
 	/**
@@ -274,7 +253,7 @@ public class FeedControllerTest {
 				.memberId(1L)
 				.build();
 		
-		given(feedService.edit(1L, null, null, null, null, null)).willReturn(new Feed());
+		given(feedService.edit(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(new Feed());
 		
 		//when & then
 		mvc.perform
