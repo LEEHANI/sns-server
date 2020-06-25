@@ -56,16 +56,16 @@ public class Feed
 	private Member member;
 	
 	@Default
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "feed_id")
 	private List<Resource> resources = new ArrayList<>();
 	
 	@Default
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "feed")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "feed")
 	private List<FeedItem> items = new ArrayList<>();
 	
 	@Default
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "feed")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "feed")
 	private List<FeedTag> tags = new ArrayList<>();
 	
 //	@Default

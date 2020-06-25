@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.may.app.feed.entity.Feed;
 
-public interface FeedRepository extends JpaRepository<Feed, Long> {
+public interface FeedRepository extends JpaRepository<Feed, Long>, FeedRepositoryCustom {
 	@Query(value = "SELECT f FROM Feed f JOIN f.member m ON m.id=:memberId WHERE f.id=:id")
 	Optional<Feed> findByIdAndMemberId(@Param("id") Long id, @Param("memberId") Long memberId);
 	

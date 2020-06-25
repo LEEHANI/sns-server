@@ -97,11 +97,6 @@ public class FeedDto {
 	    	this.comments=comments.map(CommentDto.Parent::new);
 	    }
 	    
-	    public Get(Feed feed, GoodDto good) {
-	    	this(feed);
-	    	setGood(good);
-	    }
-	    
 	    public Get(Feed feed, Page<Comment> comments, GoodDto good) {
 	    	this(feed, comments);
 	    	this.isGood=good.getIsGood();

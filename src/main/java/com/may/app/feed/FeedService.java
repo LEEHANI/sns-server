@@ -8,7 +8,9 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,10 +90,16 @@ public class FeedService {
 	
 	@Transactional(readOnly = true)
 	public FeedDto.Get detail(Long id, Long requestMemberId) {
-		Feed feed = feedRepository.findById(id).orElseThrow(()-> new NoFeedException());
-		GoodDto good = goodCheck(id, requestMemberId);
+		Feed feed = feedRepository.findDetailById(id).orElseThrow(()-> new NoFeedException());
+		FeedDto.Get dto = feedRepository.findDetailDtoById(feed);
 		
-		return new FeedDto.Get(feed, good);
+		GoodDto good = goodCheck(id, requestMemberId);
+		Page<Comment> comments = commentRepository.findComments(feed, PageRequest.of(0, 100));
+		
+		dto.setComments(comments);
+		dto.setGood(good);
+		
+		return dto;
 	}
 	
 	private GoodDto goodCheck(Long feedId, Long memberId) {
@@ -104,7 +112,6 @@ public class FeedService {
 	@Transactional(readOnly = true)
 	@Cacheable(cacheNames = "feeds", key="#pageable")
 	public Page<FeedDto.GetList> list(PageRequest pageable, Long requestMemberId) {
-		// feed + XXToOne entity 조회
 		Page<Feed> feeds = feedRepository.findEntityGraphBy(pageable);
 		Page<GetList> pages = feeds.map(o-> new FeedDto.GetList(o, goodCheck(o.getId(), requestMemberId))); 
 		return pages;
